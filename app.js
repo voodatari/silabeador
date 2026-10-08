@@ -426,7 +426,9 @@ const app = {
         const niveles = paso / k < (tactil ? 64 : 32) * (this._escCort || 1) ? 2 : 1;
         // una sola fila: cada botón se ajusta a su propio hueco; dos alturas: todos del mismo ancho
         const anchoDoble = Math.max(30 * k, Math.min(84 * k, 2 * paso - 8 * k));
-        const anchos = centros.map((x, i) => niveles === 2 ? anchoDoble : Math.max(24 * k, Math.min(84 * k, local(i) - 5 * k)));
+        // todos los botones de una palabra del mismo tamaño: el más pequeño que haga falta
+        const unico = Math.max(24 * k, Math.min(84 * k, paso - 5 * k));
+        const anchos = centros.map(() => niveles === 2 ? anchoDoble : unico);
         const maxAncho = Math.max(...anchos);
         const padH = niveles === 1 && !tactil ? Math.max(34 * k, Math.min(56 * k, maxAncho * 0.75)) : Math.max(38 * k, Math.min(60 * k, maxAncho * 0.9));
         const sep = 0.3 * fs, entre = 8 * k;
