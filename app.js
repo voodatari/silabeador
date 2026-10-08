@@ -414,19 +414,30 @@ const app = {
         // 2) botones: si no caben en fila, se escalonan en dos alturas (medidas relativas al tamaño base de la página)
         const fs = parseFloat(getComputedStyle(c).fontSize);
         const k = ((parseFloat(getComputedStyle(document.documentElement).fontSize) || 16) / 16) * (this._escCort || 1);
-        const centro = p => { const r = p.getBoundingClientRect(); return r.left + r.width / 2; };
-        let paso = 60 * k;   // distancia mínima entre dos huecos seguidos (la «i» y la «l» son estrechas)
-        for (let i = 1; i < palancas.length; i++) paso = i === 1 ? centro(palancas[1]) - centro(palancas[0]) : Math.min(paso, centro(palancas[i]) - centro(palancas[i - 1]));
-        const niveles = paso / k < 64 * (this._escCort || 1) ? 2 : 1;
-        const padW = Math.max(30 * k, niveles === 2 ? Math.min(84 * k, 2 * paso - 8 * k) : Math.min(84 * k, paso - 6 * k));
-        const padH = Math.max(38 * k, Math.min(60 * k, padW * 0.9));
+        const centros = palancas.map(p => { const r = p.getBoundingClientRect(); return r.left + r.width / 2; });
+        const local = i => {   // distancia al hueco vecino más cercano (la «i» y la «l» son estrechas)
+            const izq = i > 0 ? centros[i] - centros[i - 1] : Infinity, der = i < centros.length - 1 ? centros[i + 1] - centros[i] : Infinity;
+            const m = Math.min(izq, der);
+            return isFinite(m) ? m : 60 * k;
+        };
+        const paso = Math.min(...centros.map((x, i) => local(i)));
+        const tactil = window.matchMedia('(any-pointer: coarse)').matches;
+        // con ratón los botones pueden ser más pequeños y caben en una sola fila; con el dedo se piden más grandes
+        const niveles = paso / k < (tactil ? 64 : 32) * (this._escCort || 1) ? 2 : 1;
+        // una sola fila: cada botón se ajusta a su propio hueco; dos alturas: todos del mismo ancho
+        const anchoDoble = Math.max(30 * k, Math.min(84 * k, 2 * paso - 8 * k));
+        const anchos = centros.map((x, i) => niveles === 2 ? anchoDoble : Math.max(24 * k, Math.min(84 * k, local(i) - 5 * k)));
+        const maxAncho = Math.max(...anchos);
+        const padH = niveles === 1 && !tactil ? Math.max(34 * k, Math.min(56 * k, maxAncho * 0.75)) : Math.max(38 * k, Math.min(60 * k, maxAncho * 0.9));
         const sep = 0.3 * fs, entre = 8 * k;
-        c.style.setProperty('--padw', padW + 'px');
         c.style.setProperty('--padh', padH + 'px');
         c.style.setProperty('--sep', sep + 'px');
-        c.style.setProperty('--hit', Math.min(paso * 0.9, 46 * k) + 'px');
         c.style.setProperty('--entre', entre + 'px');
-        palancas.forEach((p, i) => p.classList.toggle('n2', niveles === 2 && i % 2 === 1));
+        palancas.forEach((p, i) => {
+            p.style.setProperty('--padw', anchos[i] + 'px');
+            p.style.setProperty('--hit', Math.min(local(i) * 0.9, 46 * k) + 'px');
+            p.classList.toggle('n2', niveles === 2 && i % 2 === 1);
+        });
         c.style.paddingBottom = (sep + niveles * padH + (niveles - 1) * entre + 6 * k) + 'px';
     },
 
