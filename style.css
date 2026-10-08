@@ -666,3 +666,49 @@ html.movil .answer-note { min-height: 1.3rem; margin-top: 0.3rem; font-size: 0.9
 html.movil .cortador-ayuda { display: none; }
 html.movil .acciones-cortador { flex-wrap: nowrap; gap: 0.5rem; }
 html.movil .acciones-cortador button { flex: 1 1 0; max-width: none; padding: 0.7rem 0.3rem; font-size: 0.9rem; letter-spacing: 0.02rem; }
+
+
+/* =========================================================
+   Tablero de juego con tamaño CONSTANTE: ocupa el alto disponible (con un máximo en pantallas grandes),
+   así no cambia de tamaño entre dividir, tónica y clasificar, ni entre los pasos de «Todo junto».
+   El contenido se reparte dentro: pregunta arriba, ejercicio en medio, respuesta abajo.
+   ========================================================= */
+#screen-game > .game-board { flex: 1 1 auto; height: auto; min-height: 22rem; max-height: 36rem; justify-content: flex-start; }
+#screen-game .game-board #question-area { flex: 1 1 auto; justify-content: space-evenly; }
+#screen-game .game-board .answer-note { margin-top: 0; }
+
+/* Móvil: los paneles ocupan todo el alto disponible y reparten su contenido */
+@media (max-width: 640px) {
+    .screen > .glass-panel { height: 100%; display: flex; flex-direction: column; justify-content: space-evenly; }
+    #screen-config .panel-contenido, #screen-results .panel-contenido { display: flex; flex-direction: column; justify-content: space-evenly; min-height: 100%; }
+    .modes-grid { flex: 1 1 auto; width: 100%; grid-auto-rows: 1fr; margin: 0.6rem auto; }
+    .activity-grid { flex: 1 1 auto; width: 100%; grid-auto-rows: 1fr; align-items: stretch; }
+    .activity-card { align-content: center; }
+    .stats-display { margin: 0.8rem 0; }
+    .ranking-table-container { flex: 1 1 auto; max-height: none; }
+    .res-repasar, .res-detail { margin-top: 0; }
+    #screen-game > .game-board { max-height: none; min-height: 0; padding: 0.8rem 0.7rem; }
+}
+html.movil .screen > .glass-panel { height: 100%; display: flex; flex-direction: column; justify-content: space-evenly; }
+html.movil #screen-config .panel-contenido, html.movil #screen-results .panel-contenido { display: flex; flex-direction: column; justify-content: space-evenly; min-height: 100%; }
+html.movil .modes-grid { flex: 1 1 auto; width: 100%; grid-auto-rows: 1fr; margin: 0.6rem auto; }
+html.movil .activity-grid { flex: 1 1 auto; width: 100%; grid-auto-rows: 1fr; align-items: stretch; }
+html.movil .activity-card { align-content: center; }
+html.movil .stats-display { margin: 0.8rem 0; }
+html.movil .ranking-table-container { flex: 1 1 auto; max-height: none; }
+html.movil .res-repasar, html.movil .res-detail { margin-top: 0; }
+html.movil #screen-game > .game-board { max-height: none; min-height: 0; padding: 0.8rem 0.7rem; }
+/* el tablero de juego sigue siendo un panel hijo directo de la pantalla: conserva su propio alto */
+#screen-game > .game-board { height: auto; }
+
+/* Móvil: la pantalla de inicio agrupa logo y texto arriba, nombre y botones abajo */
+@media (max-width: 640px) {
+    #screen-home .glass-panel { justify-content: flex-start; }
+    #screen-home .logo-title { margin-top: auto; }
+    #screen-home .player-input-container { margin-top: auto; }
+    #screen-home .stack { margin-bottom: 0.6rem; }
+}
+html.movil #screen-home .glass-panel { justify-content: flex-start; }
+html.movil #screen-home .logo-title { margin-top: auto; }
+html.movil #screen-home .player-input-container { margin-top: auto; }
+html.movil #screen-home .stack { margin-bottom: 0.6rem; }
