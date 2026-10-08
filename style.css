@@ -712,3 +712,10 @@ html.movil #screen-home .glass-panel { justify-content: flex-start; }
 html.movil #screen-home .logo-title { margin-top: auto; }
 html.movil #screen-home .player-input-container { margin-top: auto; }
 html.movil #screen-home .stack { margin-bottom: 0.6rem; }
+
+/* Más aire entre el indicador de paso y el enunciado de la pregunta */
+.step-indicator { margin-bottom: 0.9rem; }
+.step-indicator:empty { margin-bottom: 0; }
+@media (max-width: 640px) { .step-indicator { margin-bottom: 0.55rem; } .step-indicator:empty { margin-bottom: 0; } }
+html.movil .step-indicator { margin-bottom: 0.55rem; }
+html.movil .step-indicator:empty { margin-bottom: 0; }
