@@ -636,3 +636,33 @@ html.movil #screen-results .section-title { margin-bottom: 0.4rem; }
 .panel-contenido { width: 100%; }
 @media (max-width: 640px) { .action-buttons button:last-child { grid-column: 1 / -1; } }
 html.movil .action-buttons button:last-child { grid-column: 1 / -1; }
+
+/* Móvil: pantalla de juego compacta para que «Comprobar» no quede cortado */
+@media (max-width: 640px) {
+    #screen-game { gap: 0.4rem; }
+    #active-mode-display { font-size: 0.65rem; letter-spacing: 0.06rem; }
+    .game-hud { padding: 0.4rem 0.7rem; }
+    .hud-value { font-size: 1.1rem; }
+    #streak-badge { min-height: 1.1rem; font-size: 0.8rem; }
+    .game-board { padding: 0.8rem 0.7rem; }
+    .step-indicator { min-height: 1rem; margin-bottom: 0.2rem; }
+    .question-display { margin-bottom: 0.3rem; }
+    #question-area { gap: 0.8rem; }
+    .answer-note { min-height: 1.3rem; margin-top: 0.3rem; font-size: 0.95rem; }
+    .cortador-ayuda { display: none; }
+    .acciones-cortador { flex-wrap: nowrap; gap: 0.5rem; }
+    .acciones-cortador button { flex: 1 1 0; max-width: none; padding: 0.7rem 0.3rem; font-size: 0.9rem; letter-spacing: 0.02rem; }
+}
+html.movil #screen-game { gap: 0.4rem; }
+html.movil #active-mode-display { font-size: 0.65rem; letter-spacing: 0.06rem; }
+html.movil .game-hud { padding: 0.4rem 0.7rem; }
+html.movil .hud-value { font-size: 1.1rem; }
+html.movil #streak-badge { min-height: 1.1rem; font-size: 0.8rem; }
+html.movil .game-board { padding: 0.8rem 0.7rem; }
+html.movil .step-indicator { min-height: 1rem; margin-bottom: 0.2rem; }
+html.movil .question-display { margin-bottom: 0.3rem; }
+html.movil #question-area { gap: 0.8rem; }
+html.movil .answer-note { min-height: 1.3rem; margin-top: 0.3rem; font-size: 0.95rem; }
+html.movil .cortador-ayuda { display: none; }
+html.movil .acciones-cortador { flex-wrap: nowrap; gap: 0.5rem; }
+html.movil .acciones-cortador button { flex: 1 1 0; max-width: none; padding: 0.7rem 0.3rem; font-size: 0.9rem; letter-spacing: 0.02rem; }

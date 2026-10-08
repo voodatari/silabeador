@@ -140,8 +140,8 @@ const app = {
         this.$('ranking-mode-select').addEventListener('change', () => this.renderRanking());
         this.$('ranking-activity-select').addEventListener('change', () => this.renderRanking());
 
-        window.addEventListener('resize', () => { this.ajustarCortador(); ['screen-config', 'screen-results'].forEach(id => { if (this.$(id).classList.contains('active')) this.ajustarPanel(id); }); });
-        if (document.fonts) document.fonts.addEventListener('loadingdone', () => this.ajustarCortador());
+        window.addEventListener('resize', () => { this.encajarCortador(); ['screen-config', 'screen-results'].forEach(id => { if (this.$(id).classList.contains('active')) this.ajustarPanel(id); }); });
+        if (document.fonts) document.fonts.addEventListener('loadingdone', () => this.encajarCortador());
         document.addEventListener('keydown', e => this.teclado(e));
         this.pintarConfig();
     },
@@ -363,7 +363,7 @@ const app = {
                 '<div class="cortador-ayuda">Cada sílaba es un golpe de voz.</div>' +
                 '<div class="acciones-cortador"><button type="button" class="btn-secondary" id="btn-borrar">Borrar cortes</button>' +
                 '<button type="button" class="btn-primary" id="btn-comprobar">Comprobar ✔</button></div>';
-            this.ajustarCortador();
+            this.encajarCortador();
             this.$('cortador').addEventListener('click', e => {
                 const h = e.target.closest('.palanca'); if (!h) return;
                 this.alternarCorte(parseInt(h.dataset.pos, 10), h);
@@ -407,16 +407,17 @@ const app = {
 
         // 1) tamaño de letra: la palabra ocupa el ancho disponible (con un tope)
         c.style.setProperty('--tam', '2rem');
-        const rem = Math.min(6, 2 * disponible / ancho() * 0.98);
+        const esc = this._escCort || 1;   // <1 si hay que reducir para que quepa en la pantalla
+        const rem = Math.min(6, 2 * disponible / ancho() * 0.98) * esc;
         c.style.setProperty('--tam', rem.toFixed(2) + 'rem');
 
         // 2) botones: si no caben en fila, se escalonan en dos alturas (medidas relativas al tamaño base de la página)
         const fs = parseFloat(getComputedStyle(c).fontSize);
-        const k = (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16) / 16;
+        const k = ((parseFloat(getComputedStyle(document.documentElement).fontSize) || 16) / 16) * (this._escCort || 1);
         const centro = p => { const r = p.getBoundingClientRect(); return r.left + r.width / 2; };
         let paso = 60 * k;   // distancia mínima entre dos huecos seguidos (la «i» y la «l» son estrechas)
         for (let i = 1; i < palancas.length; i++) paso = i === 1 ? centro(palancas[1]) - centro(palancas[0]) : Math.min(paso, centro(palancas[i]) - centro(palancas[i - 1]));
-        const niveles = paso / k < 64 ? 2 : 1;
+        const niveles = paso / k < 64 * (this._escCort || 1) ? 2 : 1;
         const padW = Math.max(30 * k, niveles === 2 ? Math.min(84 * k, 2 * paso - 8 * k) : Math.min(84 * k, paso - 6 * k));
         const padH = Math.max(38 * k, Math.min(60 * k, padW * 0.9));
         const sep = 0.3 * fs, entre = 8 * k;
@@ -427,6 +428,18 @@ const app = {
         c.style.setProperty('--entre', entre + 'px');
         palancas.forEach((p, i) => p.classList.toggle('n2', niveles === 2 && i % 2 === 1));
         c.style.paddingBottom = (sep + niveles * padH + (niveles - 1) * entre + 6 * k) + 'px';
+    },
+
+    /* Si el tablero no cabe en el alto de la pantalla (móvil con las barras del navegador), reduce palabra y botones */
+    encajarCortador() {
+        if (!this.$('cortador')) return;
+        const tablero = document.querySelector('.game-board');
+        this._escCort = 1;
+        this.ajustarCortador(true);
+        for (let n = 0; tablero && n < 9 && tablero.scrollHeight > tablero.clientHeight + 1 && this._escCort > 0.58; n++) {
+            this._escCort -= 0.06;
+            this.ajustarCortador(true);
+        }
     },
 
     alternarCorte(pos, el) {
