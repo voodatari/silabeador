@@ -582,3 +582,57 @@ html.movil .logo-title { font-size: 2.8rem; }
 .screen { padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left)); }
 @media (max-width: 640px) { .screen { padding: max(0.5rem, env(safe-area-inset-top)) max(0.5rem, env(safe-area-inset-right)) max(0.5rem, env(safe-area-inset-bottom)) max(0.5rem, env(safe-area-inset-left)); } }
 html.movil .screen { padding: max(0.5rem, env(safe-area-inset-top)) max(0.5rem, env(safe-area-inset-right)) max(0.5rem, env(safe-area-inset-bottom)) max(0.5rem, env(safe-area-inset-left)); }
+
+
+/* Móvil: pantallas de configuración y resultados compactas para que quepan sin scroll */
+@media (max-width: 640px) {
+    .activity-grid { grid-template-columns: 1fr 1fr; gap: 0.5rem; margin: 0 auto 0.6rem; }
+    .activity-card { grid-template-columns: 1fr; justify-items: center; text-align: center; padding: 0.55rem 0.35rem; row-gap: 0.1rem; }
+    .activity-card .icon { grid-row: auto; font-size: 1.7rem; }
+    .activity-card strong { font-size: 0.85rem; }
+    .activity-card small { font-size: 0.7rem; line-height: 1.2; }
+    #screen-config .section-title { font-size: 1.15rem; margin-bottom: 0.6rem; }
+    #screen-config .back-btn { margin-bottom: 0.2rem; padding: 0.3rem 0.6rem; }
+    #screen-config .config-row { margin: 0.3rem 0; gap: 0.4rem; }
+    #screen-config .config-hint { margin-bottom: 0.3rem; font-size: 0.75rem; }
+    #screen-config .stack { margin-top: 0.5rem; }
+    .segmented button { padding: 0.4rem 0.7rem; min-width: 2.8rem; font-size: 0.9rem; }
+    .stats-display { flex-wrap: nowrap; gap: 0.5rem; margin: 0.8rem 0; }
+    .stat-box { flex: 1 1 0; min-width: 0; padding: 0.55rem 0.3rem; border-radius: 0.9rem; }
+    .stat-label { font-size: 0.62rem; margin-bottom: 0.25rem; }
+    .stat-value { font-size: 1.5rem; }
+    .res-detail { font-size: 0.85rem; margin-bottom: 0.4rem; }
+    .res-repasar { font-size: 0.85rem; margin: 0 auto 0.5rem; }
+    .celebration-text { font-size: 1.05rem; margin-bottom: 0.8rem; }
+    .action-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; width: 100%; }
+    .action-buttons button { max-width: none; width: 100%; padding: 0.65rem 0.4rem; font-size: 0.85rem; }
+    .action-buttons .btn-primary { grid-column: 1 / -1; font-size: 1rem; padding: 0.8rem; }
+    #screen-results .section-title { margin-bottom: 0.4rem; }
+}
+html.movil .activity-grid { grid-template-columns: 1fr 1fr; gap: 0.5rem; margin: 0 auto 0.6rem; }
+html.movil .activity-card { grid-template-columns: 1fr; justify-items: center; text-align: center; padding: 0.55rem 0.35rem; row-gap: 0.1rem; }
+html.movil .activity-card .icon { grid-row: auto; font-size: 1.7rem; }
+html.movil .activity-card strong { font-size: 0.85rem; }
+html.movil .activity-card small { font-size: 0.7rem; line-height: 1.2; }
+html.movil #screen-config .section-title { font-size: 1.15rem; margin-bottom: 0.6rem; }
+html.movil #screen-config .back-btn { margin-bottom: 0.2rem; padding: 0.3rem 0.6rem; }
+html.movil #screen-config .config-row { margin: 0.3rem 0; gap: 0.4rem; }
+html.movil #screen-config .config-hint { margin-bottom: 0.3rem; font-size: 0.75rem; }
+html.movil #screen-config .stack { margin-top: 0.5rem; }
+html.movil .segmented button { padding: 0.4rem 0.7rem; min-width: 2.8rem; font-size: 0.9rem; }
+html.movil .stats-display { flex-wrap: nowrap; gap: 0.5rem; margin: 0.8rem 0; }
+html.movil .stat-box { flex: 1 1 0; min-width: 0; padding: 0.55rem 0.3rem; border-radius: 0.9rem; }
+html.movil .stat-label { font-size: 0.62rem; margin-bottom: 0.25rem; }
+html.movil .stat-value { font-size: 1.5rem; }
+html.movil .res-detail { font-size: 0.85rem; margin-bottom: 0.4rem; }
+html.movil .res-repasar { font-size: 0.85rem; margin: 0 auto 0.5rem; }
+html.movil .celebration-text { font-size: 1.05rem; margin-bottom: 0.8rem; }
+html.movil .action-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; width: 100%; }
+html.movil .action-buttons button { max-width: none; width: 100%; padding: 0.65rem 0.4rem; font-size: 0.85rem; }
+html.movil .action-buttons .btn-primary { grid-column: 1 / -1; font-size: 1rem; padding: 0.8rem; }
+html.movil #screen-results .section-title { margin-bottom: 0.4rem; }
+
+/* Auto-ajuste al alto disponible (app.ajustarPanel): si aun así no cabe, el contenido se reduce un poco */
+.panel-contenido { width: 100%; }
+@media (max-width: 640px) { .action-buttons button:last-child { grid-column: 1 / -1; } }
+html.movil .action-buttons button:last-child { grid-column: 1 / -1; }

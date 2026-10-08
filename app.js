@@ -63,8 +63,19 @@ const app = {
 
         if (screenId === 'screen-ranking') this.abrirRanking();
         if (screenId === 'screen-config') this.pintarConfig();
+        if (screenId === 'screen-config' || screenId === 'screen-results') { this.ajustarPanel(screenId); setTimeout(() => this.ajustarPanel(screenId), 450); }
         if (['screen-home', 'screen-modes', 'screen-config'].includes(screenId)) Sonido.musica('menu');
         else if (screenId === 'screen-results' || screenId === 'screen-ranking') Sonido.musica('fin');
+    },
+
+    /* Ajusta el contenido de un panel al alto disponible (sin scroll) reduciéndolo un poco si hace falta */
+    ajustarPanel(screenId) {
+        const pantalla = this.$(screenId); if (!pantalla) return;
+        const panel = pantalla.querySelector('.glass-panel'), cont = pantalla.querySelector('.panel-contenido');
+        if (!panel || !cont) return;
+        cont.style.zoom = 1;
+        let z = 1;
+        while (panel.scrollHeight > panel.clientHeight + 1 && z > 0.7) { z -= 0.04; cont.style.zoom = z.toFixed(2); }
     },
 
     // --- INICIALIZACIÓN ---
@@ -106,6 +117,7 @@ const app = {
             Sonido.efecto('click');
             this.state.nivel = parseInt(b.dataset.nivel, 10);
             this.pintarConfig();
+            this.ajustarPanel('screen-config');
         });
         this.$('time-seg').addEventListener('click', e => {
             const b = e.target.closest('button'); if (!b) return;
@@ -128,7 +140,7 @@ const app = {
         this.$('ranking-mode-select').addEventListener('change', () => this.renderRanking());
         this.$('ranking-activity-select').addEventListener('change', () => this.renderRanking());
 
-        window.addEventListener('resize', () => this.ajustarCortador());
+        window.addEventListener('resize', () => { this.ajustarCortador(); ['screen-config', 'screen-results'].forEach(id => { if (this.$(id).classList.contains('active')) this.ajustarPanel(id); }); });
         if (document.fonts) document.fonts.addEventListener('loadingdone', () => this.ajustarCortador());
         document.addEventListener('keydown', e => this.teclado(e));
         this.pintarConfig();
