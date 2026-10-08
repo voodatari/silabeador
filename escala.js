@@ -1,14 +1,17 @@
 /* =========================================================
-   Escala fija · el juego se ve igual con cualquier escala de Windows
-   Con la escala de Windows al 125 % o al 150 %, el navegador solo
-   tiene 1536 o 1280 px de ancho (y menos alto) en lugar de 1920:
-   las ventanas ocupan proporcionalmente más y algunas no caben.
-   Con <html class="escala-fija"> el tamaño base (1 rem) se amplía o
-   reduce para ocupar la misma proporción de pantalla que en un
-   monitor 1080p al 100 %, algo ampliado para verse bien en el aula (referencia: 1500×720 px útiles). Todo el
-   CSS está en rem, así que el juego entero escala a la vez.
-   En pantallas estrechas (móvil, tableta en vertical) no se aplica.
-   Se carga en el <head> para que la clase esté puesta antes de pintar.
+   Escala · el juego se ve igual con cualquier escala de pantalla
+   1) Ordenadores: con la escala de Windows al 125 % o al 150 %, el navegador
+      solo tiene 1536 o 1280 px de ancho (y menos alto) en lugar de 1920.
+      Con <html class="escala-fija"> el tamaño base (1 rem) se amplía o reduce
+      para ocupar la misma proporción de pantalla que en un monitor 1080p al
+      100 %, algo ampliado para verse bien en el aula (referencia: 1500×720).
+      Todo el CSS está en rem, así que el juego entero escala a la vez.
+   2) Móviles y tabletas pequeñas (<html class="movil">): Safari de iOS puede
+      mostrar la página en una pantalla virtual más ancha que el teléfono (zoom
+      de página por debajo del 100 %, o «encoger para ajustar»), y entonces todo
+      sale diminuto y sin los estilos de móvil. Se compara el ancho de la
+      ventana con el de la pantalla física y se compensa con el tamaño base.
+   Se carga en el <head> para que las clases estén puestas antes de pintar.
    ========================================================= */
 window.Escala = (function (global) {
 
@@ -21,6 +24,23 @@ window.Escala = (function (global) {
 
     var activa = leer(K_ESCALA) !== '0';
 
+    /* ¿Teléfono o tableta pequeña? Ancho de su pantalla física en px CSS «normales» */
+    function dispositivo() {
+        var tactil = (navigator.maxTouchPoints || 0) > 0 || 'ontouchstart' in global;
+        var w = (global.screen && screen.width) || 0, h = (global.screen && screen.height) || 0;
+        var corto = Math.min(w, h), largo = Math.max(w, h);
+        var horizontal = global.innerWidth > global.innerHeight;
+        return { movil: tactil && corto > 0 && corto <= 600, ancho: horizontal ? largo : corto };
+    }
+
+    /* >1 si la página está en una pantalla virtual más ancha que el teléfono */
+    function compensacion() {
+        var d = dispositivo();
+        if (!d.movil || !d.ancho) return 1;
+        var r = global.innerWidth / d.ancho;
+        return r > 1.15 ? Math.min(2.2, Math.round(r * 100) / 100) : 1;
+    }
+
     function calcular() {
         var w = global.innerWidth, h = global.innerHeight;
         if (w < ANCHO_MINIMO) return 1;
@@ -28,18 +48,23 @@ window.Escala = (function (global) {
         return Math.round(Math.min(MAX, Math.max(MIN, z)) * 100) / 100;
     }
 
-    function factor() { return activa ? calcular() : 1; }
+    function factor() {
+        var c = compensacion();
+        if (c > 1) return c;                       // el móvil siempre se corrige
+        return activa && !dispositivo().movil ? calcular() : 1;
+    }
 
     function aplicar() {
-        var raiz = document.documentElement;
-        raiz.classList.toggle('escala-fija', activa);
-        raiz.style.setProperty('--escala', String(factor()));
+        var raiz = document.documentElement, f = factor();
+        raiz.classList.toggle('movil', dispositivo().movil);
+        raiz.classList.toggle('escala-fija', f !== 1);
+        raiz.style.setProperty('--escala', String(f));
         var b = document.getElementById('scale-toggle-button');
         if (b) {
             b.setAttribute('aria-pressed', String(activa));
             var nota = document.getElementById('scale-toggle-info');
             if (nota) nota.textContent = activa
-                ? 'Activada: ahora mismo al ' + Math.round(factor() * 100) + ' %.'
+                ? 'Activada: ahora mismo al ' + Math.round(f * 100) + ' %.'
                 : 'Mantiene el aspecto previsto aunque Windows use una escala del 125 % o 150 %.';
         }
     }
@@ -60,10 +85,12 @@ window.Escala = (function (global) {
     else conectarBoton();
 
     global.addEventListener('resize', aplicar);
+    global.addEventListener('orientationchange', function () { setTimeout(aplicar, 250); });
 
     return {
         activa: function () { return activa; },
-        factor: factor
+        factor: factor,
+        movil: function () { return dispositivo().movil; }
     };
 
 })(window);

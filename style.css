@@ -228,13 +228,13 @@ button.sil-chip:hover { border-color: var(--secondary); background: rgba(110, 23
 .palanca.n2 { --nivel: 1; }
 .palanca .linea {
     position: absolute; left: 50%; top: 0.08em; width: 0.07em; min-width: 3px; transform: translateX(-50%); border-radius: 3px; pointer-events: auto;
-    bottom: calc(-1 * (var(--sep, 0.3em) + var(--nivel) * (var(--padh, 3rem) + 8px)));
+    bottom: calc(-1 * (var(--sep, 0.3em) + var(--nivel) * (var(--padh, 3rem) + var(--entre, 8px))));
     background: repeating-linear-gradient(to bottom, rgba(255, 255, 255, 0.34) 0 0.2em, transparent 0.2em 0.38em);
     transition: width 0.15s, background 0.15s, box-shadow 0.15s;
 }
 .palanca .linea::before { content: ''; position: absolute; top: 0; bottom: 0; left: 50%; width: var(--hit, 1.1em); transform: translateX(-50%); }   /* zona de toque junto a la línea */
 .palanca .pad {
-    position: absolute; left: calc(50% - var(--padw, 3rem) / 2); top: calc(100% + var(--sep, 0.3em) + var(--nivel) * (var(--padh, 3rem) + 8px));
+    position: absolute; left: calc(50% - var(--padw, 3rem) / 2); top: calc(100% + var(--sep, 0.3em) + var(--nivel) * (var(--padh, 3rem) + var(--entre, 8px)));
     width: var(--padw, 3rem); height: var(--padh, 3rem); border-radius: 0.3em; pointer-events: auto;
     display: flex; align-items: center; justify-content: center; color: rgba(255, 255, 255, 0.75);
     background: rgba(255, 255, 255, 0.08); border: 0.055em dashed rgba(255, 255, 255, 0.4); box-shadow: 0 0.1em 0 rgba(0, 0, 0, 0.28);
@@ -541,3 +541,44 @@ body { background-image: radial-gradient(ellipse at 50% -10%, #1d4a55 0%, #0f2a3
 html.ligero .logo-title .sl { animation: none; }
 @media (max-width: 640px) { .logo-title { font-size: 2.8rem; } }
 @media (max-height: 700px) { .logo-title { font-size: 3rem; } }
+
+
+/* =========================================================
+   Móvil: los mismos estilos de «pantallas estrechas», activados por la clase html.movil
+   (la pone escala.js según el tamaño de la pantalla física, aunque Safari de iOS muestre
+   la página en una pantalla virtual más ancha). Generado a partir del bloque @media (max-width: 640px).
+   ========================================================= */
+html.movil #app-container { padding: 0.5rem; }
+html.movil .screen { padding: 0.5rem; }
+html.movil .glass-panel { padding: 1.1rem 0.9rem; }
+html.movil .logo-title { font-size: 2.6rem; }
+html.movil .subtitle { margin-bottom: 1.1rem; font-size: 1rem; }
+html.movil .section-title { font-size: 1.4rem; margin-bottom: 1rem; }
+html.movil .modes-grid, html.movil .activity-grid { grid-template-columns: 1fr; gap: 0.6rem; }
+html.movil .mode-card { padding: 0.8rem; flex-direction: row; gap: 0.8rem; text-align: left; }
+html.movil .mode-card .icon { font-size: 2rem; margin: 0; }
+html.movil .mode-card p { font-size: 0.8rem; }
+html.movil .config-label { min-width: 0; width: 100%; text-align: center; }
+html.movil .game-hud { padding: 0.6rem 0.7rem; border-radius: 1.2rem; }
+html.movil .hud-item { min-width: 3.5rem; }
+html.movil .hud-value { font-size: 1.15rem; }
+html.movil .btn-icon.danger-icon { padding: 0.4rem 0.6rem; font-size: 0.85rem; }
+html.movil .game-board { padding: 1rem 0.7rem; }
+html.movil .palabra-grande { font-size: 2.3rem; }
+html.movil .sil-chip { font-size: 1.5rem; padding: 0.5rem 0.7rem; min-width: 2.6rem; }
+html.movil .options-grid { grid-template-columns: 1fr; gap: 0.6rem; }
+html.movil .option-btn { min-height: 3.6rem; padding: 0.6rem; flex-direction: row; gap: 0.8rem; }
+html.movil .option-btn .tit { font-size: 1.2rem; }
+html.movil .question-display { font-size: 1.05rem; margin-bottom: 0.6rem; }
+html.movil .stat-box { min-width: 6.5rem; padding: 0.7rem; }
+html.movil .stat-value { font-size: 1.6rem; }
+html.movil .ranking-table th, html.movil .ranking-table td { padding: 0.6rem 0.4rem; font-size: 0.88rem; }
+html.movil .countdown-number { font-size: 6rem; }
+html.movil .ex-box { padding: 1.2rem 0.9rem; }
+html.movil .ex-palabra { font-size: 1.4rem; }
+html.movil .logo-title { font-size: 2.8rem; }
+
+/* Zonas seguras (muesca y barras del iPhone) */
+.screen { padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left)); }
+@media (max-width: 640px) { .screen { padding: max(0.5rem, env(safe-area-inset-top)) max(0.5rem, env(safe-area-inset-right)) max(0.5rem, env(safe-area-inset-bottom)) max(0.5rem, env(safe-area-inset-left)); } }
+html.movil .screen { padding: max(0.5rem, env(safe-area-inset-top)) max(0.5rem, env(safe-area-inset-right)) max(0.5rem, env(safe-area-inset-bottom)) max(0.5rem, env(safe-area-inset-left)); }

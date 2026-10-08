@@ -398,21 +398,23 @@ const app = {
         const rem = Math.min(6, 2 * disponible / ancho() * 0.98);
         c.style.setProperty('--tam', rem.toFixed(2) + 'rem');
 
-        // 2) botones: si no caben en fila, se escalonan en dos alturas
+        // 2) botones: si no caben en fila, se escalonan en dos alturas (medidas relativas al tamaño base de la página)
         const fs = parseFloat(getComputedStyle(c).fontSize);
+        const k = (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16) / 16;
         const centro = p => { const r = p.getBoundingClientRect(); return r.left + r.width / 2; };
-        let paso = 60;   // distancia mínima entre dos huecos seguidos (la «i» y la «l» son estrechas)
+        let paso = 60 * k;   // distancia mínima entre dos huecos seguidos (la «i» y la «l» son estrechas)
         for (let i = 1; i < palancas.length; i++) paso = i === 1 ? centro(palancas[1]) - centro(palancas[0]) : Math.min(paso, centro(palancas[i]) - centro(palancas[i - 1]));
-        const niveles = paso < 64 ? 2 : 1;
-        const padW = Math.max(30, niveles === 2 ? Math.min(84, 2 * paso - 8) : Math.min(84, paso - 6));
-        const padH = Math.max(38, Math.min(60, padW * 0.9));
-        const sep = 0.3 * fs, entre = 8;
+        const niveles = paso / k < 64 ? 2 : 1;
+        const padW = Math.max(30 * k, niveles === 2 ? Math.min(84 * k, 2 * paso - 8 * k) : Math.min(84 * k, paso - 6 * k));
+        const padH = Math.max(38 * k, Math.min(60 * k, padW * 0.9));
+        const sep = 0.3 * fs, entre = 8 * k;
         c.style.setProperty('--padw', padW + 'px');
         c.style.setProperty('--padh', padH + 'px');
         c.style.setProperty('--sep', sep + 'px');
-        c.style.setProperty('--hit', Math.min(paso * 0.9, 46) + 'px');
+        c.style.setProperty('--hit', Math.min(paso * 0.9, 46 * k) + 'px');
+        c.style.setProperty('--entre', entre + 'px');
         palancas.forEach((p, i) => p.classList.toggle('n2', niveles === 2 && i % 2 === 1));
-        c.style.paddingBottom = (sep + niveles * padH + (niveles - 1) * entre + 6) + 'px';
+        c.style.paddingBottom = (sep + niveles * padH + (niveles - 1) * entre + 6 * k) + 'px';
     },
 
     alternarCorte(pos, el) {
