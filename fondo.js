@@ -14,7 +14,7 @@ window.Fondo = (function () {
 
     var TIPOS = ['letras', 'voz', 'golpes', 'none'];
     var tipo = leer(K_FONDO);
-    if (TIPOS.indexOf(tipo) < 0) tipo = 'voz';
+    if (TIPOS.indexOf(tipo) < 0) tipo = 'letras';      // por defecto: letras
 
     var VOCALES = 'aeiou', LETRAS = 'bcdfghjlmnpqrstvz';
     var SILABAS = ['ca', 'sa', 'ma', 'ta', 'lla', 'ción', 'mos', 'pe', 'rro', 'ñe', 'to', 'sí', 'lá', 'ba', 'gue', 'ci', 'dor', 'ñor', 'mi', 'ré', 'qui', 'ja', 'za'];

@@ -65,7 +65,7 @@ El motor se validó con las 53.430 palabras del diccionario: solo 48 tienen alg�
 ## Interfaz
 
 - Estilo de pizarra y tiza; tipografías Lilita One y Andika (Google Fonts).
-- **Fondos animados:** ondas de voz (por defecto), letras y sílabas flotando, golpes de voz o ninguno.
+- **Fondos animados:** letras y sílabas flotando (por defecto), ondas de voz, golpes de voz o ninguno.
 - **Modo ligero:** quita el desenfoque en equipos modestos (se activa solo si lo detecta).
 - **Escala fija:** el juego se ve igual con cualquier escala de Windows. En móvil compensa el zoom de página de Safari en iPhone.
 - Todo el CSS está en `rem`, por eso escala entero a la vez.
