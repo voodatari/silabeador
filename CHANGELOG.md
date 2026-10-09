@@ -2,6 +2,12 @@
 
 Formato de versión: `AAAA.MM.DD-letra`, igual que el número que llevan los archivos en `index.html`. Las versiones grandes llevan número propio (2.0).
 
+## [2.0.4] - 2026-10-09
+- **La voz carga más rápido y gasta mucha menos red.**
+  - El fonemizador solo lleva el español (y el inglés, que usa con algunas palabras extranjeras): sus datos pasan de 18,1 MB a 0,95 MB. Comprobado con 419 textos: fonemas idénticos.
+  - La voz se guarda en el dispositivo la primera vez (almacén del navegador): las siguientes visitas no la vuelven a descargar (solo ~0,2 MB) y funciona aunque no haya conexión. La web pide al navegador que no la borre si le falta espacio.
+  - Primera visita: ~74 MB de descarga real (antes ~83 MB). Visitas siguientes: casi nada.
+
 ## [2.0.3] - 2026-10-09
 - Fondo animado por defecto: «Letras» (letras y sílabas flotando). Quien ya hubiera elegido otro en Opciones lo conserva.
 

@@ -28,15 +28,42 @@ async function descargar(url, alAvanzar) {
     return salida.buffer;
 }
 
+/* GUARDADO EN EL DISPOSITIVO. La primera vez, el modelo (~71 MB), el motor ONNX y el fonemizador se guardan en el almacén
+   del navegador (Cache Storage); las siguientes visitas los leen de ahí: carga casi instantánea y sin gastar red (también
+   sin conexión). El almacén lleva la versión de estos archivos: SI CAMBIA ALGO EN piper/, SUBE VERSION_VOZ y se volverán a
+   descargar (los almacenes de versiones anteriores se borran solos). Si el navegador no lo permite, se descarga como siempre. */
+var VERSION_VOZ = '2026.10.09-b', PREFIJO_CACHE = 'silabeador-voz-', almacen = null;
+async function abrirAlmacen() {
+    try {
+        if (!self.caches) return null;
+        var nombre = PREFIJO_CACHE + VERSION_VOZ, c = await caches.open(nombre);
+        (await caches.keys()).forEach(function (k) { if (k.indexOf(PREFIJO_CACHE) === 0 && k !== nombre) caches.delete(k); });
+        return c;
+    } catch (e) { return null; }
+}
+/* el archivo como ArrayBuffer: del almacén si ya está; si no, se descarga (con progreso) y se guarda */
+async function traer(url, alAvanzar) {
+    if (almacen) { try { var g = await almacen.match(url); if (g) { if (alAvanzar) alAvanzar(1); return await g.arrayBuffer(); } } catch (e) {} }
+    var buf = await descargar(url, alAvanzar || function () {});
+    if (almacen) { try { await almacen.put(url, new Response(buf, { headers: { 'Content-Type': 'application/octet-stream' } })); } catch (e) {} }
+    return buf;
+}
+/* lo mismo, como dirección blob: (para las librerías que cargan sus archivos ellas solas) */
+async function urlLocal(url, tipo) { return URL.createObjectURL(new Blob([await traer(url)], { type: tipo })); }
+var urlFonWasm = null, urlFonData = null;
+
 async function iniciar() {
     importScripts(BASE + 'ort/ort.wasm.min.js', BASE + 'piper_phonemize.js');
-    ort.env.wasm.wasmPaths = BASE + 'ort/';
+    almacen = await abrirAlmacen();
+    ort.env.wasm.wasmPaths = { 'ort-wasm-simd.wasm': await urlLocal(BASE + 'ort/ort-wasm-simd.wasm', 'application/wasm') };
     ort.env.wasm.numThreads = 1;            // sin hilos de WASM: no hay aislamiento de origen en http local ni en GitHub Pages
     avisar({ t: 'progreso', f: 0.02 });
 
     config = JSON.parse(await (await fetch(BASE + 'voces/' + VOZ + '.onnx.json')).text());
     hablante = (config.speaker_id_map || {})[HABLANTE] || 0;
-    var modelo = await descargar(BASE + 'voces/' + VOZ + '.onnx', function (f) { avisar({ t: 'progreso', f: 0.03 + 0.8 * f }); });
+    urlFonWasm = await urlLocal(BASE + 'piper_phonemize.wasm', 'application/wasm');
+    urlFonData = await urlLocal(BASE + 'piper_phonemize.data', 'application/octet-stream');
+    var modelo = await traer(BASE + 'voces/' + VOZ + '.onnx', function (f) { avisar({ t: 'progreso', f: 0.03 + 0.8 * f }); });
     sesion = await ort.InferenceSession.create(modelo, { executionProviders: ['wasm'] });
     avisar({ t: 'progreso', f: 0.86 });
 
@@ -60,7 +87,7 @@ async function crearFonemizador() {
             } catch (e) {}
         },
         printErr: function () {},
-        locateFile: function (u) { return BASE + 'piper_phonemize' + (u.indexOf('.wasm') > 0 ? '.wasm' : u.indexOf('.data') > 0 ? '.data' : '.js'); }
+        locateFile: function (u) { return u.indexOf('.wasm') > 0 ? (urlFonWasm || BASE + 'piper_phonemize.wasm') : u.indexOf('.data') > 0 ? (urlFonData || BASE + 'piper_phonemize.data') : BASE + 'piper_phonemize.js'; }
     });
     llamadas = 0;
 }

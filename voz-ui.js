@@ -53,6 +53,8 @@ window.VozUI = (function () {
 
     function cargar() {
         if (!palabras && !explica) return;
+        // que el navegador no borre la voz guardada en el dispositivo cuando le falte espacio (si lo permite)
+        try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(function () {}); } catch (e) {}
         Voz.iniciar(alProgreso).catch(function () {});
     }
 

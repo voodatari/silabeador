@@ -45,7 +45,8 @@ Cada explicación se construye con la regla concreta que se aplica a esa palabra
 La voz es [Piper](https://github.com/rhasspy/piper) ejecutándose **en el navegador** (WebAssembly, en un Web Worker para no frenar las animaciones): no hay servidor de voz ni se envía nada a internet.
 
 - Voz `es_ES-sharvard-medium` (mujer). El modelo incluido está **ampliado** con una segunda salida (la duración de cada fonema), que se usa para recortar con precisión.
-- Se descarga una vez al entrar (~105 MB) y queda en memoria; una barra arriba muestra el progreso. Si la voz no carga, el juego sigue igual sin ella.
+- La primera vez se descargan ~74 MB (casi todo es el modelo de voz) y se **guardan en el dispositivo** (almacén del navegador): las visitas siguientes no vuelven a descargarlos y la voz funciona también sin conexión. Una barra arriba muestra el progreso. Si la voz no carga, el juego sigue igual sin ella.
+- El fonemizador (espeak-ng) va recortado: solo lleva los datos del español (y del inglés, para algunas palabras extranjeras).
 - **Palabras:** se sintetiza «Esta era la palabra: X» y se recorta justo donde empieza X, para que la palabra tenga la entonación natural de una frase. Si el fonemizador pone la tónica en otra sílaba, se corrige.
 - **Sílabas:** se dicen una a una, más despacio, y la tónica un poco más lenta y más aguda.
 - La música baja con un fundido mientras habla la voz.
