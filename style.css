@@ -519,7 +519,9 @@ body { background-image: radial-gradient(ellipse at 50% -10%, #1d4a55 0%, #0f2a3
 .logo-title .sl:nth-child(9) { animation-delay: 0.9s; }
 .logo-title .pt { font-style: normal; color: var(--primary); font-size: 0.7em; opacity: 0.85; }
 .logo-title .tonica { color: var(--accent); font-size: 1.12em; text-shadow: 0 0 1.3rem rgba(255, 210, 63, 0.55), 0 0.05em 0 rgba(0, 0, 0, 0.3); margin-left: 0.04em; }
-.logo-title .tonica::after { content: '▲'; position: absolute; left: 50%; bottom: -0.5em; transform: translateX(-50%); font-size: 0.26em; color: var(--accent); }
+/* el triángulo va bajo la VOCAL de la tónica («o» de «dor»), no bajo el centro de la sílaba */
+.logo-title .nucleo-logo { position: relative; }
+.logo-title .nucleo-logo::after { content: '▲'; position: absolute; left: 50%; bottom: -0.5em; transform: translateX(-50%); font-size: 0.26em; color: var(--accent); }
 @keyframes golpe { 0%, 62%, 100% { transform: none; } 70% { transform: translateY(-0.14em) scale(1.1); } 80% { transform: none; } }
 .by-line { color: var(--secondary); font-family: var(--font-ui); font-weight: 700; letter-spacing: 0.1rem; margin-top: 0.4rem; }
 html.ligero .logo-title .sl { animation: none; }

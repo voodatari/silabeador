@@ -136,6 +136,9 @@ html.movil .ig-nav button { flex: 1 1 0; padding: 0.6rem 0.3rem; font-size: 0.85
     width: 2.6rem; height: 2.6rem; font-size: 1.2rem; line-height: 1;
 }
 body.en-juego .gear-btn { display: none; }
+/* icono SVG (no emoji): el emoji ⚙️ lo dibuja iOS algo desplazado dentro de su caja y no quedaba centrado en el círculo */
+.gear-btn { display: flex; align-items: center; justify-content: center; padding: 0; }
+.gear-btn .gear-ico { width: 1.45rem; height: 1.45rem; fill: #d9d2f0; display: block; }
 /* ---------- Cinta diagonal «v2.0»: solo en el menú principal, en la esquina superior derecha de su panel (del borde de arriba al borde derecho, recortada por la esquina redondeada) ---------- */
 /* La cinta va FUERA de la tarjeta (que tiene su propio scroll y recorta lo de dentro bajo su borde), colocada justo encima con la
    misma posición, tamaño y esquinas (app.js: posicionarCinta). Así tapa también el borde. */

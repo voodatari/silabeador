@@ -2,6 +2,10 @@
 
 Formato de versión: `AAAA.MM.DD-letra`, igual que el número que llevan los archivos en `index.html`. Las versiones grandes llevan número propio (2.0).
 
+## [2.0.2] - 2026-10-09
+- Logo: el triángulo de la sílaba tónica queda exactamente bajo la «o» de «dor».
+- Botón de opciones: la rueda es un icono propio (SVG) en vez del emoji ⚙️, que en iOS no quedaba centrado en su círculo.
+
 ## [2.0.1] - 2026-10-09
 - «Explicar los fallos» pasa a estar en **Siempre** por defecto: también en contrarreloj, muerte súbita y supervivencia se explica cada fallo (con el juego y el reloj en pausa). Quien ya lo hubiera cambiado en Opciones conserva su elección.
 
