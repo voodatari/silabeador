@@ -184,3 +184,10 @@ html.movil body:has(#screen-home.active) .gear-btn { right: auto; left: max(0.6r
 
 /* nota bajo el selector «Explicar los fallos» */
 .aj-fondo .aj-nota { font-size: 0.78rem; color: var(--text-muted); text-align: center; }
+
+/* TRANSICIONES ENTRE PANTALLAS sin perder el desenfoque en Safari (iPhone/iPad): Safari desactiva el backdrop-filter de un
+   panel mientras un contenedor suyo tiene la opacidad animada, y durante la transición la tarjeta se veía transparente con la
+   pantalla anterior detrás. Ahora la pantalla no se anima: se animan sus elementos (la tarjeta lleva su propio desenfoque). */
+.screen, .screen.active { opacity: 1; transform: none; transition: none; }
+.screen > * { opacity: 0; transform: scale(0.95); transition: opacity 0.4s ease, transform 0.4s ease; }
+.screen.active > * { opacity: 1; transform: none; }

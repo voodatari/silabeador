@@ -2,6 +2,9 @@
 
 Formato de versión: `AAAA.MM.DD-letra`, igual que el número que llevan los archivos en `index.html`. Las versiones grandes llevan número propio (2.0).
 
+## [2.0.8] - 2026-10-09
+- iPhone / Safari (sin modo ligero): durante las transiciones entre menús las tarjetas ya no pierden el efecto de cristal (desenfoque) ni dejan ver la pantalla anterior a través. Safari apaga el desenfoque si se anima la opacidad de la pantalla que lo contiene; ahora se animan las propias tarjetas.
+
 ## [2.0.7] - 2026-10-09
 - Móvil: al final de la explicación de tónica o clasificar ya no se corta nada (las píldoras de arriba, las etiquetas «antepenúltima / penúltima / última» y la insignia «ESDRÚJULA»). El tamaño se calcula con ese contenido final, y sílabas y píldoras van siempre en una fila: si no caben, se reduce todo un poco.
 
