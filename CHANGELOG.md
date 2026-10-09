@@ -2,6 +2,9 @@
 
 Formato de versión: `AAAA.MM.DD-letra`, igual que el número que llevan los archivos en `index.html`. Las versiones grandes llevan número propio (2.0).
 
+## [2.0.5] - 2026-10-09
+- Si un fallo termina la partida (muerte súbita, o la última vida en supervivencia), durante su explicación ya suena la música de «partida terminada», que sigue sin cortes en la pantalla de resultados.
+
 ## [2.0.4] - 2026-10-09
 - **La voz carga más rápido y gasta mucha menos red.**
   - El fonemizador solo lleva el español (y el inglés, que usa con algunas palabras extranjeras): sus datos pasan de 18,1 MB a 0,95 MB. Comprobado con 419 textos: fonemas idénticos.

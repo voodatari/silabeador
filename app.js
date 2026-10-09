@@ -628,6 +628,9 @@ const app = {
         if (VozUI.explicarEn(s.mode)) {
             // explicación: el juego (y el reloj) se detiene por completo hasta que se cierra
             s.pausado = true;
+            // si este fallo termina la partida (muerte súbita, o última vida en supervivencia), ya suena la música de fin
+            const terminada = s.mode === 'sudden_death' || (s.mode === 'survival' && s.lives <= 0);
+            if (terminada) Sonido.musica('fin');
             const datos = { tipo: q.tipo, palabra: q.A.palabra, elegida: valor };
             const animada = VozUI.explicacion();
             if (animada) Infografia.preparar(datos);      // empieza a sintetizar la narración mientras se ve la respuesta correcta
@@ -636,7 +639,7 @@ const app = {
             await (animada ? Infografia.mostrar(datos) : Explicacion.mostrar(datos));
             s.pausado = false;
             if (!s.isPlaying) return;
-            if (s.mode === 'sudden_death' || (s.mode === 'survival' && s.lives <= 0)) this.endGame();
+            if (terminada) this.endGame();
             else this.siguientePregunta();
         } else if (s.mode === 'practice') {      // práctica sin explicaciones
             this.later(() => this.siguientePregunta(), 1600);
