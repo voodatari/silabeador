@@ -2,7 +2,7 @@
 
 Formato de versión: `AAAA.MM.DD-letra`, igual que el número que llevan los archivos en `index.html`. Las versiones grandes llevan número propio (2.0).
 
-## [2.0] - 2026-10-11
+## [2.0] - 2026-10-09
 Versión 2: el juego habla.
 - **Voz sintética en el propio dispositivo** (Piper, voz «Sharvard» en español de España), sin servidores ni conexión una vez cargada. Se descarga una vez al entrar (~105 MB: modelo de voz, fonemizador y motor ONNX) y queda en memoria; mientras tanto el juego funciona sin voz.
 - **Pronuncia cada palabra nueva** (y el botón 🔊 la repite). La palabra se genera dentro de la frase «Esta era la palabra: …» y se recorta exactamente donde empieza, para que suene con entonación natural.
