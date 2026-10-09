@@ -719,3 +719,12 @@ html.movil #screen-home .stack { margin-bottom: 0.6rem; }
 @media (max-width: 640px) { .step-indicator { margin-bottom: 0.55rem; } .step-indicator:empty { margin-bottom: 0; } }
 html.movil .step-indicator { margin-bottom: 0.55rem; }
 html.movil .step-indicator:empty { margin-bottom: 0; }
+
+/* «Reducir movimiento»: los avisos que informan al jugador (¡Velocidad luz!, +10…) no se apagan:
+   se muestran con un simple fundido, sin desplazarse ni cambiar de tamaño */
+@keyframes aviso-fundido { 0% { opacity: 0; } 15% { opacity: 1; } 75% { opacity: 1; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+    .speed-popup { animation: aviso-fundido 1.2s ease forwards !important; transform: translateY(-2.5rem); }
+    .float-text { animation: aviso-fundido 0.95s ease forwards !important; transform: translate(-50%, -80%); }
+    .streak-pop { animation: none !important; }
+}
