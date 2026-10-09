@@ -265,10 +265,13 @@ window.Infografia = (function () {
             this.insignia.textContent = I.NOMBRE[this.A.clase].toUpperCase(); this.insignia.className = 'ig-insignia ver ' + this.A.clase;
         }
         l.style.zoom = 1;
-        var filas = [this.cols, this.pildorasEl];       // van en una sola fila: si no caben a lo ancho, se reduce todo
+        /* sílabas y píldoras van en una sola fila: si algo no cabe (a lo ancho o a lo alto), se reduce todo. Se mide con
+           rectángulos reales: en Safari (iPhone) scrollWidth no avisaba del desborde con zoom y la explicación salía cortada */
+        var piezas = [].slice.call(this.cols.children).concat([].slice.call(this.pildorasEl.children), [palabra]);
         function nocabe() {
-            return raiz.scrollHeight > raiz.clientHeight + 1 || palabra.getBoundingClientRect().width > raiz.clientWidth - 6 ||
-                filas.some(function (f) { return f.scrollWidth > f.clientWidth + 1; });
+            var r = raiz.getBoundingClientRect(), lr = l.getBoundingClientRect();
+            if (lr.height > r.height + 1) return true;
+            return piezas.some(function (e) { var q = e.getBoundingClientRect(); return q.width > 0 && (q.left < r.left + 2 || q.right > r.right - 2); });
         }
         while (nocabe() && z > 0.35) { z -= 0.04; l.style.zoom = z.toFixed(2); }
         if (guardado) {
@@ -486,6 +489,7 @@ window.Infografia = (function () {
             function construirEscena(hasta) {
                 if (escena) escena.parar();
                 escena = new Escena(velo.querySelector('.ig-escenario'), A, datos.tipo);
+                (function (e) { setTimeout(function () { if (escena === e) e.encajar(); }, 450); })(escena);   // otra vez, ya abierta la ventana y con las fuentes cargadas
                 escena.rapido = true;
                 for (var k = 0; k < hasta; k++) {
                     var x = beats[k];

@@ -2,6 +2,11 @@
 
 Formato de versión: `AAAA.MM.DD-letra`, igual que el número que llevan los archivos en `index.html`. Las versiones grandes llevan número propio (2.0).
 
+## [2.1] - 2026-10-09
+- **Nivel 4 (🔥)**: solo palabras difíciles, sacadas de los niveles 1-3: con hiato (35 %), con diptongo o triptongo (35 %) y con grupos de consonantes complicados (30 %: examen, corrección, instante, transporte…). Puntuación ×2,5. El modo Mixto sigue mezclando los niveles 1-3.
+- «Todo junto»: después de explicar un fallo en la sílaba tónica ya no se pregunta la clase de esa palabra (la explicación acaba de decirla): se pasa a la palabra siguiente. Nunca se vuelve a preguntar algo que una explicación acaba de contar.
+- Móvil (iPhone): la explicación animada ya no se ve cortada por los lados. El ajuste de tamaño mide con las posiciones reales de cada elemento (en Safari la medida anterior fallaba) y se repite cuando la ventana ya está abierta.
+
 ## [2.0.8] - 2026-10-09
 - iPhone / Safari (sin modo ligero): durante las transiciones entre menús las tarjetas ya no pierden el efecto de cristal (desenfoque) ni dejan ver la pantalla anterior a través. Safari apaga el desenfoque si se anima la opacidad de la pantalla que lo contiene; ahora se animan las propias tarjetas.
 

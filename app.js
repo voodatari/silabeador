@@ -18,7 +18,7 @@ const app = {
         playerName: '',
         mode: 'timeattack',
         actividad: 'clasificar',
-        nivel: 1,                 // 1, 2, 3 · 0 = mixto
+        nivel: 1,                 // 1, 2, 3, 4 (difíciles) · 0 = mixto (1-3)
         tiempo: 60,               // contrarreloj
         score: 0, streak: 0, maxStreak: 0,
         total: 0, aciertos: 0, lives: 3,
@@ -42,11 +42,12 @@ const app = {
     PASOS_COMBINADA: ['silabas', 'tonica', 'clasificar'],
     // Cuenta atrás 3-2-1 antes de empezar: desactivada hasta que haya un modo con base de datos (ranking compartido)
     CUENTA_ATRAS: false,
-    MULT_NIVEL: { 1: 1, 2: 1.5, 3: 2 },
+    MULT_NIVEL: { 1: 1, 2: 1.5, 3: 2, 4: 2.5 },
     DESC_NIVEL: {
         1: 'Nivel 1 · palabras muy frecuentes, de hasta 3 sílabas.',
         2: 'Nivel 2 · palabras más variadas, de hasta 4 sílabas.',
         3: 'Nivel 3 · palabras menos habituales, de hasta 5 sílabas.',
+        4: 'Nivel 4 · solo palabras difíciles: hiatos, diptongos y grupos de consonantes (examen, corrección…).',
         0: 'Mixto · mezcla los tres niveles.'
     },
 
@@ -96,7 +97,7 @@ const app = {
 
         const cfg = this.leer('config', {});
         if (this.TIPOS[cfg.actividad]) this.state.actividad = cfg.actividad;
-        if ([0, 1, 2, 3].includes(cfg.nivel)) this.state.nivel = cfg.nivel;
+        if ([0, 1, 2, 3, 4].includes(cfg.nivel)) this.state.nivel = cfg.nivel;
         if ([30, 60, 90, 120].includes(cfg.tiempo)) this.state.tiempo = cfg.tiempo;
 
         nameInput.addEventListener('input', e => {
@@ -224,7 +225,31 @@ const app = {
 
     // --- PALABRAS ---
     _datos: {},
+    /* NIVEL 4 (difíciles): las palabras de los niveles 1-3 que tienen hiato, diptongo o triptongo, o un grupo de consonantes
+       complicado (x, cc, tres consonantes seguidas, dos consonantes cerrando sílaba: examen, corrección, instante…).
+       Se reparten en tres grupos y se elige 35 % hiatos, 35 % diptongos y 30 % consonantes: predominan los vocálicos. */
+    REPARTO_N4: [['hiato', 0.35], ['diptongo', 0.35], ['consonantes', 0.30]],
+    datosNivel4() {
+        if (this._datos[4]) return this._datos[4];
+        const grupos = { hiato: [], diptongo: [], consonantes: [] };
+        [1, 2, 3].forEach(n => this.datosNivel(n).lista.forEach(a => {
+            const m = new Set(a.juntas.map(j => j.motivo)), w = a.palabra;
+            const g = m.has('hiato') ? 'hiato' : (m.has('diptongo') || m.has('triptongo')) ? 'diptongo'
+                : (/x|cc/.test(w) || m.has('coda') || /[bcdfgjklmnñpqstvwxz]{3}/.test(w.replace(/ch|ll|rr|qu/g, 'K'))) ? 'consonantes' : null;
+            if (g) grupos[g].push(Object.assign({}, a, { nivel: 4 }));
+        }));
+        const datos = { grupos: {} }, todas = [];
+        Object.keys(grupos).forEach(g => {
+            const porClase = { aguda: [], llana: [], esdrujula: [] };
+            grupos[g].forEach(a => { if (porClase[a.clase]) porClase[a.clase].push(a); todas.push(a); });
+            datos.grupos[g] = { lista: grupos[g], porClase };
+        });
+        datos.lista = todas;
+        return (this._datos[4] = datos);
+    },
+
     datosNivel(n) {
+        if (n === 4) return this.datosNivel4();
         if (this._datos[n]) return this._datos[n];
         const lista = (window.PALABRAS[n] || []).map(w => Object.assign(Silabeo.analizar(w), { nivel: n }));
         const porClase = { aguda: [], llana: [], esdrujula: [] };
@@ -235,7 +260,12 @@ const app = {
     elegirPalabra(actividad) {
         const s = this.state;
         const nivel = s.nivel || [1, 2, 3][Math.floor(Math.random() * 3)];
-        const d = this.datosNivel(nivel);
+        let d = this.datosNivel(nivel);
+        if (nivel === 4) {             // primero el grupo (hiatos, diptongos o consonantes), luego como siempre
+            let r = Math.random(), g = 'consonantes';
+            for (const [nombre, peso] of this.REPARTO_N4) { if (r < peso) { g = nombre; break; } r -= peso; }
+            d = d.grupos[g].lista.length ? d.grupos[g] : d;
+        }
         let pool;
         if (actividad === 'silabas') pool = d.lista;
         else {
@@ -632,8 +662,11 @@ const app = {
             await (animada ? Infografia.mostrar(datos) : Explicacion.mostrar(datos));
             s.pausado = false;
             if (!s.isPlaying) return;
-            if (terminada) this.endGame();
-            else this.siguientePregunta();
+            if (terminada) { this.endGame(); return; }
+            // nunca se vuelve a preguntar algo que la explicación acaba de contar: la de la tónica dice también la clase
+            // de la palabra, así que en «Todo junto» se salta el paso de clasificar y se pasa a la palabra siguiente
+            if (q.pasos && q.tipo === 'tonica') q.paso = q.pasos.length - 1;
+            this.siguientePregunta();
         } else if (s.mode === 'practice') {      // práctica sin explicaciones
             this.later(() => this.siguientePregunta(), 1600);
         } else if (s.mode === 'sudden_death') {

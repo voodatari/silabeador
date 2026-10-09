@@ -26,7 +26,7 @@ No necesita cuentas ni base de datos: el ranking, el nombre y los ajustes se gua
 
 En ⚙️ Opciones, **«Explicar los fallos»** decide cuándo se explica un error: *No*, *En práctica* o *Siempre* (por defecto). En *Siempre*, en los otros tres modos el juego se pausa por completo (también el reloj) mientras dura la explicación.
 
-Hay tres **niveles** (más frecuentes y cortas → menos habituales y largas) y un modo mixto. La puntuación se multiplica por 1, 1,5 o 2 según el nivel de la palabra.
+Hay tres **niveles** (más frecuentes y cortas → menos habituales y largas), un **nivel 4** solo con palabras difíciles y un modo mixto (niveles 1-3). La puntuación se multiplica por 1, 1,5, 2 o 2,5 según el nivel de la palabra.
 
 ## Silabeo
 
@@ -60,6 +60,9 @@ Salen del diccionario `es_ec` (Hunspell, ortografía de Ecuador) del proyecto Ac
 | 1 | entre las 6.000 más usadas | hasta 3 | 2.253 |
 | 2 | entre las 16.000 más usadas | hasta 4 | 3.187 |
 | 3 | entre las 32.000 más usadas | hasta 5 | 3.784 |
+| 4 🔥 | palabras de los niveles 1-3 con hiato, diptongo o triptongo, o con grupos de consonantes difíciles (x, cc, tres consonantes seguidas…) | hasta 5 | 2.852 |
+
+En el nivel 4 se elige primero el grupo (35 % hiatos, 35 % diptongos, 30 % consonantes), para que predominen las dificultades con vocales.
 
 El motor se validó con las 53.430 palabras del diccionario: solo 48 tienen algún aviso (casi todas tildes diacríticas como *cómo*, *té* o *más*). La lista final está en [palabras.js](palabras.js), generado automáticamente. Las herramientas que lo generan (`generar-palabras.js`, `validar-diccionario.js`, `probar-silabeo.js`) y las listas de exclusión viven en la carpeta `herramientas/` del proyecto local y no se publican.
 
