@@ -1,6 +1,19 @@
 # Historial de cambios
 
-Formato de versión: `AAAA.MM.DD-letra`, igual que el número que llevan los archivos en `index.html`.
+Formato de versión: `AAAA.MM.DD-letra`, igual que el número que llevan los archivos en `index.html`. Las versiones grandes llevan número propio (2.0).
+
+## [2.0] - 2026-10-11
+Versión 2: el juego habla.
+- **Voz sintética en el propio dispositivo** (Piper, voz «Sharvard» en español de España), sin servidores ni conexión una vez cargada. Se descarga una vez al entrar (~105 MB: modelo de voz, fonemizador y motor ONNX) y queda en memoria; mientras tanto el juego funciona sin voz.
+- **Pronuncia cada palabra nueva** (y el botón 🔊 la repite). La palabra se genera dentro de la frase «Esta era la palabra: …» y se recorta exactamente donde empieza, para que suene con entonación natural.
+- **Explicación animada y narrada** al fallar: infografía paso a paso (dividir, buscar la tónica, contar desde el final…), con las sílabas dichas una a una, la tónica más lenta y algo más aguda, y controles ◀ ⏸ ↻ ▶. Si se desactiva, se muestra la explicación escrita de siempre.
+- **«Explicar los fallos»** en Opciones: No · En práctica (por defecto) · Siempre. En «Siempre», en contrarreloj, muerte súbita y supervivencia el juego se pausa por completo (también el reloj) mientras se explica.
+- La música baja con un fundido mientras habla la voz y vuelve después.
+- Explicaciones revisadas: más claras («la «c» se junta con la vocal de detrás: «cil»», «la «s» no tiene vocal detrás y se queda en la sílaba de delante»), solo el dígrafo que se ha separado, letras dichas por su nombre («la letra ene»), y sin reglas de acentuación (terminaciones en n, s o vocal).
+- Silabeo: «hu» + vocal empieza sílaba también tras vocal débil (chi-hua-hua).
+- Resultados: «Otra actividad», «Ranking» y «Menú principal» (se quita «Otro modo», que repetía el menú).
+- La primera palabra de cada partida se prepara mientras se configura: suena al instante.
+- Cinta «v2.0» en el menú principal.
 
 ## [2026.10.09-x] - 2026-10-09
 - El juego ignora el ajuste de Windows «Mostrar animaciones» (`prefers-reduced-motion`) y se muestra siempre como fue diseñado, sin versión alternativa. Esto corrige que los avisos de juego («¡Velocidad luz!», «¡Qué rápido!», «+10») no se vieran en ordenadores con ese ajuste desactivado.

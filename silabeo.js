@@ -92,9 +92,9 @@
                     var actual = nucleos[nucleos.length - 1];
                     var previa = actual.us[actual.us.length - 1];
                     var nueva = racha[k].u, esF = clase(nueva) === 'F';
-                    /* débil tras h entre dos fuertes: se une a la que sigue (ca-ca-hue-te) */
-                    var haciaDelante = racha[k].h && clase(nueva) === 'D' && actual.fuerte &&
-                        racha[k + 1] && clase(racha[k + 1].u) === 'F';
+                    /* débil tras h seguida de fuerte: «hu»/«hi» + vocal empieza sílaba (ca-ca-hue-te, chi-hua-hua) */
+                    var haciaDelante = racha[k].h && clase(nueva) === 'D' &&
+                        racha[k + 1] && !racha[k + 1].h && clase(racha[k + 1].u) === 'F';
                     var corta = hiato(previa, nueva) || (esF && actual.fuerte) || haciaDelante;
                     if (corta) {
                         huecos.push(racha[k].h ? [racha[k].h] : []);

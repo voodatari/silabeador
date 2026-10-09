@@ -9,12 +9,12 @@
     var modal = document.getElementById('settings-modal');
     var botonMusica = document.getElementById('music-toggle-button');
     var botonEfectos = document.getElementById('sfx-toggle-button');
-    var selectorFondo = document.getElementById('bg-selector');
+    var fondos = [].slice.call(document.querySelectorAll('#bg-seg button'));
 
     function pintar() {
         botonMusica.setAttribute('aria-pressed', String(Sonido.musicaActiva()));
         botonEfectos.setAttribute('aria-pressed', String(Sonido.efectosActivos()));
-        selectorFondo.value = Fondo.tipo();
+        fondos.forEach(function (b) { b.classList.toggle('selected', b.dataset.fondo === Fondo.tipo()); });
     }
     pintar();
 
@@ -30,7 +30,7 @@
 
     botonMusica.addEventListener('click', function () { Sonido.alternarMusica(); pintar(); Sonido.efecto('click'); });
     botonEfectos.addEventListener('click', function () { Sonido.alternarEfectos(); pintar(); Sonido.efecto('click'); });
-    selectorFondo.addEventListener('change', function () { Fondo.set(selectorFondo.value); Sonido.efecto('click'); });
+    fondos.forEach(function (b) { b.addEventListener('click', function () { Fondo.set(b.dataset.fondo); pintar(); Sonido.efecto('click'); }); });
     document.getElementById('perf-toggle-button').addEventListener('click', function () {
         Sonido.efecto('click');
         setTimeout(Fondo.recrear, 0);

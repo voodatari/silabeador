@@ -53,16 +53,9 @@ window.Explicacion = (function () {
         if (A.tilde) {
             var v = A.silabas[A.tildeEn].match(/[áéíóú]/)[0];
             return 'Lleva tilde en la <b>' + v + '</b>, y la tilde siempre marca la sílaba tónica: ' + silTon + '.' +
-                (A.clase === 'esdrujula' ? ' <small>(Las esdrújulas siempre llevan tilde.)</small>' : '');
+                '';
         }
-        var ult = w[w.length - 1];
-        if (A.normal) {
-            var fin = A.terminacion === 'vocal' ? 'una <b>vocal</b>' : 'la letra <b>' + ult + '</b>';
-            return 'No lleva tilde y termina en ' + fin + '. Las palabras sin tilde que acaban en vocal, <b>n</b> o <b>s</b> ' +
-                'son <b>llanas</b>: la tónica es la penúltima, ' + silTon + '.';
-        }
-        return 'No lleva tilde y termina en la consonante <b>' + ult + '</b> (no es n ni s). Las palabras sin tilde ' +
-            'que acaban así son <b>agudas</b>: la tónica es la última, ' + silTon + '.';
+        return '';      // sin tilde no se explica nada más (ni terminaciones en n, s o vocal): la tónica es la que suena más fuerte
     }
 
     /* ---------- CLASIFICAR ---------- */
@@ -81,7 +74,7 @@ window.Explicacion = (function () {
     function pasosClase(A) {
         return '<ol class="ex-pasos">' +
             '<li>Divide la palabra en <b>sílabas</b> (golpes de voz): ' + fichas(A, false) + '</li>' +
-            '<li>Busca la <b>sílaba tónica</b>, la que suena más fuerte. ' + reglaTonica(A) + '<div class="ex-truco">' + TRUCO + '</div></li>' +
+            '<li>Busca la <b>sílaba tónica</b>, la que suena más fuerte. La tónica es ' + sil(A.silabas[A.tonica]) + '.<div class="ex-truco">' + TRUCO + '</div></li>' +
             '<li>Cuenta desde el <b>final</b> hasta la tónica:' + posiciones(A) +
                 '<div class="ex-conclusion">Antepenúltima ➜ esdrújula · Penúltima ➜ llana · Última ➜ aguda<br>' +
                 'Es <b class="ex-bien">' + NOMBRE[A.clase] + '</b>.</div></li>' +
@@ -98,7 +91,7 @@ window.Explicacion = (function () {
     function pasosTonica(A) {
         return '<ol class="ex-pasos">' +
             '<li>Di la palabra en voz alta, alargando cada sílaba. ' + TRUCO + '</li>' +
-            '<li>¿Lleva tilde? ' + reglaTonica(A) + '</li>' +
+            '<li>¿Lleva tilde? ' + (A.tilde ? reglaTonica(A) : 'No. La tónica es la sílaba que suena más fuerte: ' + sil(A.silabas[A.tonica]) + '.') + '</li>' +
             '<li>Así queda, con la tónica marcada:' + posiciones(A) +
                 '<div class="ex-conclusion">Es <b class="ex-bien">' + NOMBRE[A.clase] + '</b> (la tónica es la ' + ORDINAL[A.pos] + ').</div></li>' +
             '</ol>';
@@ -112,7 +105,7 @@ window.Explicacion = (function () {
         digrafo: 'ch, ll y rr son un solo sonido, y la u de qu / gu (que, gue…) no suena: no se separan.',
         inseparable: 'Grupos inseparables: pr, pl, br, bl, tr, dr, cr, cl, fr, fl, gr, gl. Las dos consonantes se quedan juntas con la vocal siguiente.',
         cc: 'Dos consonantes seguidas (que no son un grupo inseparable) se reparten: la primera cierra una sílaba y la segunda abre la siguiente.',
-        'v-cv': 'Una sola consonante entre dos vocales se une a la vocal que va <b>después</b>.'
+        'v-cv': 'Una consonante entre dos vocales se junta con la vocal de <b>detrás</b>.'
     };
     var ORDEN_REGLAS = ['hiato', 'diptongo', 'triptongo', 'digrafo', 'inseparable', 'cc', 'v-cv'];
 
@@ -142,23 +135,62 @@ window.Explicacion = (function () {
         return orden.map(function (k) { return { motivo: k, pos: g[k] }; });
     }
 
+    /* Los dígrafos que de verdad se han separado (no se cuentan todos: «cha» no necesita hablar de qu / gu) */
+    var DIGRAFO = {
+        ch: { txt: '<b>ch</b> suena como un solo sonido', voz: 'La che suena como un solo sonido.' },
+        ll: { txt: '<b>ll</b> suena como un solo sonido', voz: 'La elle suena como un solo sonido.' },
+        rr: { txt: '<b>rr</b> suena como un solo sonido', voz: 'La erre doble suena como un solo sonido.' },
+        qu: { txt: 'en <b>qu</b> la u no suena (que, qui)', voz: 'En que y en qui, la u no suena.' },
+        gu: { txt: 'en <b>gu</b> la u no suena (gue, gui)', voz: 'En gue y en gui, la u no suena.' }
+    };
+    function digrafosDe(A, pos) {
+        var vistos = [];
+        pos.forEach(function (p) { var d = A.palabra.slice(p - 1, p + 1).toLowerCase(); if (DIGRAFO[d] && vistos.indexOf(d) < 0) vistos.push(d); });
+        return vistos;
+    }
+    function textoDigrafo(A, pos) {
+        var d = digrafosDe(A, pos);
+        return d.length ? d.map(function (k) { return DIGRAFO[k].txt; }).join('; ') : 'ch, ll y rr suenan como un solo sonido, y la u de qu / gu no suena';
+    }
+    function vozDigrafo(A, pos) {
+        var d = digrafosDe(A, pos);
+        return d.length ? d.map(function (k) { return DIGRAFO[k].voz; }).join(' ') : 'Esas letras suenan como un solo sonido, y la u de que y gue no suena.';
+    }
+    /* sílaba que EMPIEZA en la posición p (la que forma la consonante con la vocal de detrás) */
+    /* sílaba que CONTIENE la letra i */
+    function silabaDe(A, i) {
+        var ini = 0;
+        for (var k = 0; k < A.silabas.length; k++) { if (i < ini + A.silabas[k].length) return A.silabas[k]; ini += A.silabas[k].length; }
+        return '';
+    }
+    function silabaDesde(A, p) {
+        var ini = 0;
+        for (var k = 0; k < A.silabas.length; k++) { if (ini === p) return A.silabas[k]; ini += A.silabas[k].length; }
+        return '';
+    }
+    /* la consonante (o dígrafo: ll, ch, rr) que empieza en p, hasta la vocal */
+    function consonanteDesde(A, p) {
+        var w = A.palabra.toLowerCase(), q = p;
+        while (q < w.length && !/[aeiouáéíóúü]/.test(w[q])) q++;
+        return w.slice(p, q) || w[p];
+    }
     function mensajeGrupo(A, motivo, pos, sobra) {
         var L = lista(A, pos);
         if (sobra) {
             switch (motivo) {
-                case 'digrafo': return 'Has separado ' + L + ': ch, ll y rr suenan como un solo sonido, y la u de qu / gu no suena. <b>Nunca se separan</b>.';
+                case 'digrafo': return 'Has separado ' + L + ': ' + textoDigrafo(A, pos) + '. <b>Nunca se separan</b>.';
                 case 'diptongo': return 'Has separado ' + L + ': son vocales que forman un <b>diptongo</b> y se pronuncian en un solo golpe de voz.';
                 case 'triptongo': return 'Has separado ' + L + ': son tres vocales en un solo golpe de voz (<b>triptongo</b>).';
                 case 'inseparable': return 'Has separado ' + L + ': es un <b>grupo inseparable</b>; las dos consonantes van juntas con la vocal siguiente.';
-                case 'cv': return 'Has dejado sola ' + lista(A, pos, 'izq') + ': una consonante se pronuncia <b>junto a su vocal</b>.';
-                default: return 'No hay que cortar entre ' + L + ': la consonante cierra la sílaba porque la siguiente se une a su propia vocal.';
+                case 'cv': return 'Has dejado sola la ' + lista(A, pos, 'izq') + ': una consonante no forma sílaba ella sola, se junta con la vocal de <b>detrás</b>: ' + pos.slice(0, 4).map(function (p) { return sil(silabaDe(A, p - 1)); }).join(', ') + '.';
+                default: return 'Sobra el corte entre ' + pos.slice(0, 4).map(function (p) { return sil(A.palabra[p - 1]) + ' y ' + sil(A.palabra[p]); }).join(', ') + ': ' + (pos.length === 1 ? 'la ' + sil(A.palabra[pos[0]]) + ' no tiene una vocal detrás, así que se queda en la sílaba de delante: ' : 'esas consonantes no tienen una vocal detrás, así que se quedan en la sílaba de delante: ') + pos.slice(0, 4).map(function (p) { return sil(silabaDe(A, p - 1)); }).join(', ') + '.';
             }
         }
         switch (motivo) {
             case 'hiato-tilde': return 'Falta cortar entre ' + L + ': la vocal con tilde (í, ú) junto a otra vocal rompe el diptongo y se pronuncia aparte (<b>hiato</b>).';
-            case 'hiato': return 'Falta cortar entre ' + L + ': dos vocales abiertas (a, e, o) seguidas no forman diptongo, son un <b>hiato</b> y van en sílabas distintas.';
+            case 'hiato': return 'Falta cortar entre ' + L + ': dos vocales abiertas (a, e, o) seguidas no forman diptongo, son un <b>hiato</b> y van en sílabas distintas.' + (/h/.test(L) ? ' (La h no suena.)' : '');
             case 'cc': return 'Falta cortar entre ' + L + ': dos consonantes seguidas se <b>reparten</b>; la primera cierra la sílaba y la segunda empieza la siguiente.';
-            default: return 'Falta cortar antes de ' + lista(A, pos, 'der') + ': entre vocales, una sola consonante se une a la vocal que va <b>después</b>.';
+            default: return (pos.length === 1 ? 'Falta un corte' : 'Faltan cortes') + ': <b>' + A.silabas.join('-') + '</b>. ' + (pos.length === 1 ? 'La ' + sil(consonanteDesde(A, pos[0])) + ' está entre dos vocales y se junta con la de <b>detrás</b>: ' : 'Una consonante entre dos vocales se junta con la de <b>detrás</b>: ') + pos.slice(0, 4).map(function (p) { return sil(silabaDesde(A, p)); }).join(', ') + '.';
         }
     }
 
@@ -185,7 +217,7 @@ window.Explicacion = (function () {
         grupos(A, sobran, true).forEach(function (g) { li.push(mensajeGrupo(A, g.motivo, g.pos, true)); });
         grupos(A, faltan, false).forEach(function (g) { li.push(mensajeGrupo(A, g.motivo, g.pos, false)); });
         li = li.slice(0, 4);
-        var dado = elegida.length ? esc(partirPor(A.palabra, elegida).join('-')) : esc(A.palabra) + ' <small>(sin ningún corte)</small>';
+        var dado = elegida.length ? esc(partirPor(A.palabra, elegida).join('-')) : esc(A.palabra) + ' (sin ningún corte)';
         return '<p>Tu división: ' + malo(dado) + ' · La correcta: <b class="ex-bien">' + esc(A.silabas.join('-')) + '</b></p>' +
             '<ul class="ex-lista">' + li.map(function (t) { return '<li>' + t + '</li>'; }).join('') + '</ul>' +
             palabraConCortes(A, elegida) +
@@ -207,7 +239,9 @@ window.Explicacion = (function () {
             var ej = m === 'v-cv' || m === 'cc' || m === 'hiato'
                 ? ' En esta palabra: ' + sil(A.silabas.join('-')) + '.'
                 : ' En esta palabra: ' + sil(parDe(A, j.pos)) + '.';
-            reglas.push('<li>' + REGLA[m] + ej + '</li>');
+            var txt = REGLA[m];
+            if (m === 'digrafo') { var dp = A.juntas.filter(function (x) { return x.motivo === 'digrafo'; }).map(function (x) { return x.pos; }); txt = textoDigrafo(A, dp).replace(/^./, function (c) { return c.toUpperCase(); }) + ': no se separan.'; }
+            reglas.push('<li>' + txt + ej + '</li>');
         });
         return '<ol class="ex-pasos">' +
             '<li>Cuenta los <b>golpes de voz</b>: cada vocal (o grupo de vocales que suenan juntas) es el centro de una sílaba. ' +
@@ -294,6 +328,13 @@ window.Explicacion = (function () {
         });
     }
 
-    return { mostrar: mostrar };
+    /* piezas de texto que reutiliza la infografía animada con voz (infografia.js) */
+    var interno = {
+        NOMBRE: NOMBRE, ORDINAL: ORDINAL, DEFINICION: DEFINICION, REGLA: REGLA, ORDEN_REGLAS: ORDEN_REGLAS,
+        reglaTonica: reglaTonica, porQueClase: porQueClase, porQueTonica: porQueTonica,
+        grupos: grupos, mensajeGrupo: mensajeGrupo, silabaDesde: silabaDesde, silabaDe: silabaDe, consonanteDesde: consonanteDesde, vozDigrafo: vozDigrafo, partirPor: partirPor, parDe: parDe
+    };
+
+    return { mostrar: mostrar, interno: interno };
 
 })();

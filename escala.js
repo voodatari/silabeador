@@ -64,8 +64,8 @@ window.Escala = (function (global) {
             b.setAttribute('aria-pressed', String(activa));
             var nota = document.getElementById('scale-toggle-info');
             if (nota) nota.textContent = activa
-                ? 'Activada: ahora mismo al ' + Math.round(f * 100) + ' %.'
-                : 'Mantiene el aspecto previsto aunque Windows use una escala del 125 % o 150 %.';
+                ? 'Activada · ahora al ' + Math.round(f * 100) + ' %'
+                : 'Mismo aspecto con cualquier escala';
         }
     }
     aplicar();

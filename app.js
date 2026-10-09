@@ -1,8 +1,16 @@
 /**
  * Silabeador · navegación, partida, resultados y ranking local
  * Actividades: clasificar (aguda/llana/esdrújula) · silabas (dividir) · tonica · combinada (las tres seguidas)
- * Modos: timeattack · sudden_death · survival · practice (con explicación de cada error)
+ * Modos: timeattack · sudden_death · survival · practice (con explicación de cada error; en los demás modos, si en Opciones
+ *        «Explicar los fallos» está en «Siempre», el juego se pausa por completo —también el reloj— mientras se explica el fallo)
  */
+// Las palabras se dicen un poco más despacio (0,85) y con la g clara; fundido de música rápido
+const VOZ_PALABRA = { rapido: true, vel: 0.85, claro: true };
+// ...y con el acento que sabe el juego (silabeo propio), porque la voz se equivoca a veces con palabras sueltas
+// ...y precedidas de una portadora («la,») que se descarta: dicha sola, una palabra suena peor que dentro de una frase
+const PORTADORA_PALABRAS = 'esta es la palabra';          // '' para desactivarla
+function vozPalabra(A) { return Object.assign({ palabra: { silabas: A.silabas, tonica: A.tonica, portadora: PORTADORA_PALABRAS || undefined } }, VOZ_PALABRA); }
+
 const app = {
 
     // --- ESTADO ---
@@ -53,6 +61,7 @@ const app = {
     // --- NAVEGACIÓN ---
     showScreen(screenId, sinSonido) {
         if (!sinSonido) Sonido.efecto('click');
+        document.body.classList.toggle('en-juego', screenId === 'screen-game');     // el botón de opciones no se ve durante la partida
         document.querySelectorAll('.screen').forEach(s => {
             s.classList.remove('active');
             setTimeout(() => { if (!s.classList.contains('active')) s.classList.add('hidden'); }, 400);
@@ -61,6 +70,7 @@ const app = {
         target.classList.remove('hidden');
         setTimeout(() => target.classList.add('active'), 50);
 
+        if (screenId === 'screen-home') this.seguirCinta(900);
         if (screenId === 'screen-ranking') this.abrirRanking();
         if (screenId === 'screen-config') this.pintarConfig();
         if (screenId === 'screen-config' || screenId === 'screen-results') { this.ajustarPanel(screenId); setTimeout(() => this.ajustarPanel(screenId), 450); }
@@ -131,7 +141,10 @@ const app = {
         });
 
         this.$('btn-abort').addEventListener('click', () => this.abortar());
+        this.$('btn-oir').addEventListener('click', () => { if (this.state.q) Voz.decir(this.state.q.A.palabra, vozPalabra(this.state.q.A)); });
+        VozUI.alCambiar(() => this.actualizarBotonOir());
         this.$('btn-retry').addEventListener('click', () => { Sonido.efecto('click'); this.startGame(); });
+        this.$('btn-otra-actividad').addEventListener('click', () => this.showScreen('screen-config'));   // el mismo modo, otra actividad / nivel
         this.$('btn-change-name').addEventListener('click', () => this.abrirCambioNombre());
         this.$('btn-name-cancel').addEventListener('click', () => { Sonido.efecto('click'); this.$('modal-change-name').classList.add('hidden'); });
         this.$('btn-name-ok').addEventListener('click', () => this.confirmarNombre());
@@ -143,7 +156,29 @@ const app = {
         window.addEventListener('resize', () => { this.encajarCortador(); ['screen-config', 'screen-results'].forEach(id => { if (this.$(id).classList.contains('active')) this.ajustarPanel(id); }); });
         if (document.fonts) document.fonts.addEventListener('loadingdone', () => this.encajarCortador());
         document.addEventListener('keydown', e => this.teclado(e));
+        window.addEventListener('resize', () => this.posicionarCinta());
+        if (window.ResizeObserver) { const pp = document.querySelector('#screen-home .glass-panel'); if (pp) new ResizeObserver(() => this.posicionarCinta()).observe(pp); }
+        this.seguirCinta(900);
         this.pintarConfig();
+    },
+
+    /* la cinta «v2.0» se coloca sobre la esquina superior derecha de la tarjeta del menú principal */
+    posicionarCinta() {
+        const sec = this.$('screen-home'), c = sec && sec.querySelector('.cinta-version'), p = sec && sec.querySelector('.glass-panel');
+        if (!c || !p) return;
+        // medidas de maquetación (offset*), no getBoundingClientRect: la pantalla entra con un scale() y la cinta, que está dentro,
+        // ya se escala con ella; con medidas ya escaladas el escalado se aplicaba dos veces y la cinta se veía desplazada
+        let x = 0, y = 0, el = p;
+        while (el && el !== sec) { x += el.offsetLeft; y += el.offsetTop; el = el.offsetParent; }
+        Object.assign(c.style, { left: x + 'px', top: y + 'px', width: p.offsetWidth + 'px', height: p.offsetHeight + 'px',
+            borderRadius: getComputedStyle(p).borderTopRightRadius });
+    },
+
+    /* mientras la tarjeta entra con su animación, la cinta la sigue en cada fotograma (si no, se ve un momento fuera de su sitio) */
+    seguirCinta(ms) {
+        const fin = performance.now() + ms;
+        const paso = () => { this.posicionarCinta(); if (performance.now() < fin) requestAnimationFrame(paso); };
+        paso();
     },
 
     pintarConfig() {
@@ -154,6 +189,21 @@ const app = {
         this.$('time-row').style.display = s.mode === 'timeattack' ? '' : 'none';
         this.$('level-hint').textContent = this.DESC_NIVEL[s.nivel];
         this.$('config-title').textContent = this.MODOS[s.mode].charAt(0) + this.MODOS[s.mode].slice(1).toLowerCase() + ' · ¿qué quieres practicar?';
+        this.prepararPrimera();
+    },
+
+    /* La primera palabra de la partida se elige y se sintetiza ya mientras se configura (cada cambio de actividad o nivel la renueva):
+       así, al pulsar jugar, suena sin esperar los ~0,9 s de la síntesis. */
+    prepararPrimera() {
+        const s = this.state;
+        try {
+            if (!s.actividad || !window.VozUI || !VozUI.palabras() || Voz.estado() !== 'lista') return;
+            const clave = s.actividad + '|' + s.nivel;
+            if (this._pre && this._pre.clave === clave) return;
+            const A = this.elegirPalabra(s.actividad);
+            this._pre = { clave, A };
+            Voz.precargar(A.palabra, vozPalabra(A));
+        } catch (e) { this._pre = null; }
     },
 
     abrirCambioNombre() {
@@ -211,7 +261,13 @@ const app = {
         const s = this.state;
         this.clearLater();
         clearInterval(s.timerId);
-        Object.assign(s, { score: 0, streak: 0, maxStreak: 0, total: 0, aciertos: 0, lives: 3, q: null, falladas: [], recientes: [], isPlaying: false });
+        Object.assign(s, { score: 0, streak: 0, maxStreak: 0, total: 0, aciertos: 0, lives: 3, q: null, falladas: [], recientes: [], proxima: null, isPlaying: false, pausado: false });
+        Voz.parar();
+        // la primera palabra se sintetiza YA (mientras se pinta la pantalla): así no hay espera al empezar
+        const pre = this._pre && this._pre.clave === s.actividad + '|' + s.nivel ? this._pre.A : null;
+        this._pre = null;
+        s.proxima = pre || this.elegirPalabra(s.actividad);
+        if (VozUI.palabras()) Voz.precargar(s.proxima.palabra, vozPalabra(s.proxima));
         updateStreak(0);
         this.$('hud-score').textContent = '0';
         this.$('question-area').innerHTML = '';
@@ -271,6 +327,7 @@ const app = {
             if (!ok || !s.isPlaying) return;
         }
         s.isPlaying = false;
+        Voz.parar();
         clearInterval(s.timerId);
         this.clearLater();
         this.showScreen('screen-home');
@@ -280,7 +337,7 @@ const app = {
         const s = this.state;
         clearInterval(s.timerId);
         s.timerId = setInterval(() => {
-            if (!s.isPlaying) return;
+            if (!s.isPlaying || s.pausado) return;          // pausado: mientras se explica un fallo
             if (s.mode === 'practice') s.timeRemaining++;
             else s.timeRemaining--;
             this.pintarTiempo();
@@ -307,12 +364,13 @@ const app = {
         const s = this.state;
         if (!s.isPlaying) return;
         const prev = s.q;
-        let q;
+        let q, nueva = false;
         if (prev && prev.pasos && prev.paso < prev.pasos.length - 1) {
             q = Object.assign({}, prev, { paso: prev.paso + 1, resuelta: false });   // siguiente paso de la misma palabra
             q.tipo = q.pasos[q.paso];
         } else {
-            const A = this.elegirPalabra(s.actividad);
+            const A = s.proxima || this.elegirPalabra(s.actividad);
+            s.proxima = null; nueva = true;
             q = { A, nivel: A.nivel, resuelta: false };
             if (s.actividad === 'combinada') { q.pasos = this.PASOS_COMBINADA; q.paso = 0; q.tipo = q.pasos[0]; }
             else q.tipo = s.actividad;
@@ -327,11 +385,21 @@ const app = {
         }
         this.$('answer-note').innerHTML = '';
         this.pintarPregunta();
+        if (nueva) {
+            if (VozUI.palabras()) Voz.decir(q.A.palabra, vozPalabra(q.A));              // pronuncia la palabra nueva
+            s.proxima = this.elegirPalabra(s.actividad);               // y deja lista la siguiente (se sintetiza mientras se juega)
+            if (VozUI.palabras()) Voz.precargar(s.proxima.palabra, vozPalabra(s.proxima));
+        }
+    },
+
+    actualizarBotonOir() {
+        this.$('btn-oir').classList.toggle('hidden', !VozUI.palabras() || Voz.estado() === 'error');
     },
 
     pintarPregunta() {
         const q = this.state.q, A = q.A, area = this.$('question-area'), texto = this.$('question-text');
         area.classList.remove('bloqueado');
+        this.actualizarBotonOir();
 
         // indicador de pasos (solo en «Todo junto»)
         const ind = this.$('step-indicator');
@@ -556,17 +624,25 @@ const app = {
         if (!s.falladas.includes(q.A.palabra)) s.falladas.push(q.A.palabra);
         this.feedback(false);
 
-        if (s.mode === 'practice') {
+        if (s.mode === 'survival') { s.lives--; this.pintarVidas(); }
+        if (VozUI.explicarEn(s.mode)) {
+            // explicación: el juego (y el reloj) se detiene por completo hasta que se cierra
+            s.pausado = true;
+            const datos = { tipo: q.tipo, palabra: q.A.palabra, elegida: valor };
+            const animada = VozUI.explicacion();
+            if (animada) Infografia.preparar(datos);      // empieza a sintetizar la narración mientras se ve la respuesta correcta
             await new Promise(r => this.later(r, 900));
             if (!s.isPlaying) return;
-            await Explicacion.mostrar({ tipo: q.tipo, palabra: q.A.palabra, elegida: valor });
+            await (animada ? Infografia.mostrar(datos) : Explicacion.mostrar(datos));
+            s.pausado = false;
             if (!s.isPlaying) return;
-            this.siguientePregunta();
+            if (s.mode === 'sudden_death' || (s.mode === 'survival' && s.lives <= 0)) this.endGame();
+            else this.siguientePregunta();
+        } else if (s.mode === 'practice') {      // práctica sin explicaciones
+            this.later(() => this.siguientePregunta(), 1600);
         } else if (s.mode === 'sudden_death') {
             this.later(() => this.endGame(), 1800);
         } else if (s.mode === 'survival') {
-            s.lives--;
-            this.pintarVidas();
             if (s.lives <= 0) this.later(() => this.endGame(), 1800);
             else this.later(() => this.siguientePregunta(), 1600);
         } else {   // contrarreloj
@@ -615,12 +691,14 @@ const app = {
     endGame() {
         const s = this.state;
         if (!s.isPlaying) return;
+        Voz.parar();
         s.isPlaying = false;
         clearInterval(s.timerId);
         this.clearLater();
 
         const precision = s.total > 0 ? Math.round(s.aciertos / s.total * 100) : 0;
         animateCount(this.$('res-score'), s.score);
+        this.$('res-jugador').textContent = s.playerName;
         this.$('res-accuracy').textContent = precision + '%';
         this.$('res-streak').textContent = s.maxStreak;
         this.$('res-detail').textContent = this.MODOS[s.mode].charAt(0) + this.MODOS[s.mode].slice(1).toLowerCase() +

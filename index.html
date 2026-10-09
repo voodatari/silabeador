@@ -11,9 +11,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Lilita+One&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=20261009x">
-    <script src="rendimiento.js?v=20261009x"></script>
-    <script src="escala.js?v=20261009x"></script>
+    <link rel="stylesheet" href="style.css?v=20261011j">
+    <link rel="stylesheet" href="voz.css?v=20261011j">
+    <script src="rendimiento.js?v=20261011j"></script>
+    <script src="escala.js?v=20261011j"></script>
 </head>
 
 <body>
@@ -21,12 +22,16 @@
     <canvas id="bg-canvas"></canvas>
     <div id="overlay"></div>
 
+    <div id="voz-carga" class="voz-carga hidden" role="status"><span id="voz-carga-texto">🗣️ Cargando la voz…</span><div class="barra"><i id="voz-carga-barra"></i></div></div>
+
+    <!-- Opciones: disponible en todos los menús (se oculta durante la partida) -->
+    <button id="settings-button" class="gear-btn" type="button" title="Opciones" aria-label="Opciones">⚙️</button>
+
     <main id="app-container">
 
         <!-- PANTALLA 1: INICIO -->
         <section id="screen-home" class="screen active">
             <div class="glass-panel text-center">
-                <button id="settings-button" class="gear-btn" type="button" title="Opciones" aria-label="Opciones">⚙️</button>
                 <h1 class="logo-title" aria-label="Silabeador"><span class="sl">Si</span><i class="pt">·</i><span class="sl">la</span><i class="pt">·</i><span class="sl">be</span><i class="pt">·</i><span class="sl">a</span><i class="pt">·</i><span class="sl tonica">dor</span></h1>
                 <p class="by-line">by profe Dani</p>
                 <p class="subtitle">Domina las sílabas y la sílaba tónica</p>
@@ -35,10 +40,11 @@
                     <input type="text" id="player-name" placeholder="Tu nombre..." autocomplete="off" maxlength="15">
                 </div>
                 <div class="stack">
-                    <button id="btn-start" class="btn-primary" disabled>Iniciar</button>
-                    <button id="btn-show-ranking" class="btn-secondary" data-go="screen-ranking">Rankings</button>
+                    <button id="btn-start" class="btn-primary" disabled>▶️ Iniciar</button>
+                    <button id="btn-show-ranking" class="btn-secondary" data-go="screen-ranking">🏆 Rankings</button>
                 </div>
             </div>
+            <div class="cinta-version" aria-hidden="true"><span>v2.0</span></div>
         </section>
 
         <!-- PANTALLA 2: SELECCIÓN DE MODO -->
@@ -155,6 +161,7 @@
             <div id="streak-badge"></div>
 
             <div class="game-board glass-panel">
+                <button id="btn-oir" class="btn-oir hidden" type="button" title="Oír la palabra otra vez" aria-label="Oír la palabra otra vez">🔊</button>
                 <div id="step-indicator" class="step-indicator"></div>
                 <div id="question-text" class="question-display"></div>
                 <div id="question-area"></div>
@@ -169,6 +176,7 @@
             <div class="glass-panel text-center">
                 <div class="panel-contenido">
                 <h2 class="section-title">¡Partida terminada!</h2>
+                <button id="btn-change-name" class="chip-jugador" type="button" title="Cambiar de jugador">👤 <span id="res-jugador"></span> · cambiar</button>
                 <div class="stats-display">
                     <div class="stat-box">
                         <span class="stat-label">Puntuación</span>
@@ -187,11 +195,12 @@
                 <div id="res-repasar" class="res-repasar"></div>
                 <p id="res-message" class="celebration-text"></p>
                 <div class="action-buttons">
-                    <button id="btn-retry" class="btn-primary">Jugar otra vez</button>
-                    <button class="btn-secondary" data-go="screen-modes">Elegir otro modo</button>
-                    <button id="btn-change-name" class="btn-secondary">Cambiar jugador</button>
-                    <button class="btn-secondary" data-go="screen-ranking">Ver ranking</button>
-                </div>
+                    <button id="btn-retry" class="btn-primary">🔄 Jugar otra vez</button>
+                    <div class="tiles">
+                        <button id="btn-otra-actividad" class="tile" type="button"><span class="t-ico">🎯</span><span class="t-txt">Otra actividad</span></button>
+                        <button class="tile" type="button" data-go="screen-ranking"><span class="t-ico">🏆</span><span class="t-txt">Ranking</span></button>
+                        <button class="tile" type="button" data-go="screen-home"><span class="t-ico">🏠</span><span class="t-txt">Menú principal</span></button>
+                    </div>
                 </div>
             </div>
         </section>
@@ -233,37 +242,48 @@
 
     </main>
 
-    <!-- Opciones (ajustes.js · rendimiento.js · escala.js) -->
+    <!-- Opciones (ajustes.js · voz-ui.js · rendimiento.js · escala.js) -->
     <div id="settings-modal" class="modal-overlay hidden">
-        <div class="glass-panel panel-sm">
+        <div class="glass-panel panel-opciones">
             <button class="close-x" data-close="settings-modal" aria-label="Cerrar">✕</button>
             <h2 class="section-title">⚙️ Opciones</h2>
-            <div class="settings-list">
-                <button id="music-toggle-button" class="setting-row" type="button" aria-pressed="true">
-                    <span class="setting-text"><strong>🎵 Música</strong><small>Música de fondo durante el juego.</small></span>
-                    <span class="perf-switch" aria-hidden="true"></span>
+            <div class="ajustes-grid">
+                <button id="music-toggle-button" class="ajuste" type="button" aria-pressed="true">
+                    <span class="aj-ico">🎵</span><span class="aj-tit">Música</span><span class="aj-sub">De fondo mientras juegas</span><span class="perf-switch" aria-hidden="true"></span>
                 </button>
-                <button id="sfx-toggle-button" class="setting-row" type="button" aria-pressed="true">
-                    <span class="setting-text"><strong>🔊 Efectos de sonido</strong><small>Sonidos al acertar, fallar y pulsar.</small></span>
-                    <span class="perf-switch" aria-hidden="true"></span>
+                <button id="sfx-toggle-button" class="ajuste" type="button" aria-pressed="true">
+                    <span class="aj-ico">🔊</span><span class="aj-tit">Efectos de sonido</span><span class="aj-sub">Aciertos, fallos y toques</span><span class="perf-switch" aria-hidden="true"></span>
                 </button>
-                <div class="setting-row setting-select">
-                    <span class="setting-text"><strong>✨ Fondo animado</strong></span>
-                    <select id="bg-selector" aria-label="Fondo animado">
-                        <option value="letras">Letras y sílabas flotando</option>
-                        <option value="voz">Ondas de voz</option>
-                        <option value="golpes">Golpes de voz</option>
-                        <option value="none">Sin animación</option>
-                    </select>
+                <button id="voz-palabras-button" class="ajuste" type="button" aria-pressed="true">
+                    <span class="aj-ico">🗣️</span><span class="aj-tit">Pronunciar las palabras</span><span class="aj-sub">Una voz dice cada palabra nueva</span><span class="perf-switch" aria-hidden="true"></span>
+                </button>
+                <button id="voz-explica-button" class="ajuste" type="button" aria-pressed="true">
+                    <span class="aj-ico">🎬</span><span class="aj-tit">Explicación con voz</span><span class="aj-sub">Infografía animada y narrada al fallar</span><span class="perf-switch" aria-hidden="true"></span>
+                </button>
+                <button id="perf-toggle-button" class="ajuste" type="button" aria-pressed="false">
+                    <span class="aj-ico">⚡</span><span class="aj-tit">Modo ligero</span><span class="aj-sub">Sin desenfoque si va lento</span><span class="perf-switch" aria-hidden="true"></span>
+                </button>
+                <button id="scale-toggle-button" class="ajuste" type="button" aria-pressed="true">
+                    <span class="aj-ico">🖥️</span><span class="aj-tit">Escala fija</span><span class="aj-sub" id="scale-toggle-info">Mismo aspecto con cualquier escala</span><span class="perf-switch" aria-hidden="true"></span>
+                </button>
+            </div>
+            <div class="aj-fondo">
+                <span class="aj-tit">🧑‍🏫 Explicar los fallos</span>
+                <div class="segmented" id="explicar-seg">
+                    <button type="button" data-explicar="no">🚫 No</button>
+                    <button type="button" data-explicar="practica">🎯 En práctica</button>
+                    <button type="button" data-explicar="siempre">✅ Siempre</button>
                 </div>
-                <button id="perf-toggle-button" class="setting-row" type="button" aria-pressed="false">
-                    <span class="setting-text"><strong>⚡ Modo ligero</strong><small>Quita el desenfoque si el juego va lento.</small></span>
-                    <span class="perf-switch" aria-hidden="true"></span>
-                </button>
-                <button id="scale-toggle-button" class="setting-row" type="button" aria-pressed="true">
-                    <span class="setting-text"><strong>🖥️ Escala fija</strong><small id="scale-toggle-info">Mantiene el aspecto previsto aunque Windows use una escala del 125 % o 150 %.</small></span>
-                    <span class="perf-switch" aria-hidden="true"></span>
-                </button>
+                <span class="aj-sub aj-nota">En los demás modos, el juego se pausa (también el reloj) mientras se explica.</span>
+            </div>
+            <div class="aj-fondo">
+                <span class="aj-tit">✨ Fondo animado</span>
+                <div class="segmented" id="bg-seg">
+                    <button type="button" data-fondo="voz">🎙️ Ondas de voz</button>
+                    <button type="button" data-fondo="letras">🔤 Letras</button>
+                    <button type="button" data-fondo="golpes">💥 Golpes de voz</button>
+                    <button type="button" data-fondo="none">🚫 Ninguno</button>
+                </div>
             </div>
         </div>
     </div>
@@ -280,15 +300,18 @@
         </div>
     </div>
 
-    <script src="bucle.js?v=20261009x"></script>
-    <script src="silabeo.js?v=20261009x"></script>
-    <script src="palabras.js?v=20261009x"></script>
-    <script src="sonido.js?v=20261009x"></script>
-    <script src="fondo.js?v=20261009x"></script>
-    <script src="efectos.js?v=20261009x"></script>
-    <script src="explicacion.js?v=20261009x"></script>
-    <script src="ajustes.js?v=20261009x"></script>
-    <script src="app.js?v=20261009x"></script>
+    <script src="bucle.js?v=20261011j"></script>
+    <script src="silabeo.js?v=20261011j"></script>
+    <script src="palabras.js?v=20261011j"></script>
+    <script src="sonido.js?v=20261011j"></script>
+    <script src="fondo.js?v=20261011j"></script>
+    <script src="efectos.js?v=20261011j"></script>
+    <script src="voz.js?v=20261011j"></script>
+    <script src="explicacion.js?v=20261011j"></script>
+    <script src="infografia.js?v=20261011j"></script>
+    <script src="ajustes.js?v=20261011j"></script>
+    <script src="voz-ui.js?v=20261011j"></script>
+    <script src="app.js?v=20261011j"></script>
 </body>
 
 </html>

@@ -68,7 +68,8 @@ window.Sonido = (function () {
         var src = PISTAS[nombre], p = pistas[src];
         if (!p) {
             p = pistas[src] = new MusicaBucle(src, { preload: 'auto' });
-            p.volume = VOLUMEN[nombre] || 0.3;
+            p.base = VOLUMEN[nombre] || 0.3;
+            p.volume = p.base * nivel;
         }
         return p;
     }
@@ -96,6 +97,51 @@ window.Sonido = (function () {
         tocar(nombre);
     }
 
+    /* Baja la música mientras habla la voz con un fundido suave y la devuelve igual de suave.
+       atenuar(true) devuelve una promesa que se cumple cuando la música YA ha bajado: la voz espera a eso.
+       La subida solo empieza cuando se pide (al terminar de hablar). Entre dos frases seguidas no sube:
+       la subida espera un momento por si llega otra. mantenerBajo(true) la deja baja hasta mantenerBajo(false). */
+    var NIVEL_BAJO = 0.15, nivel = 1, rampa = null, soltar = null, bloqueada = false;
+    var rampaPromesa = null, rampaObjetivo = null, resolverRampa = null;
+    function aplicarNivel() {
+        Object.keys(pistas).forEach(function (s) { try { pistas[s].volume = (pistas[s].base || 0.3) * nivel; } catch (e) {} });
+    }
+    function irA(objetivo, ms) {
+        if (rampa) cancelAnimationFrame(rampa);
+        if (resolverRampa) { resolverRampa(); resolverRampa = null; }
+        if (Math.abs(nivel - objetivo) < 0.005) { rampa = null; rampaObjetivo = null; return Promise.resolve(); }
+        var inicio = nivel, t0 = performance.now();
+        rampaObjetivo = objetivo;
+        rampaPromesa = new Promise(function (ok) {
+            resolverRampa = ok;
+            function paso(ahora) {
+                var t = Math.min(1, (ahora - t0) / ms);
+                var suave = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+                nivel = inicio + (objetivo - inicio) * suave;
+                aplicarNivel();
+                if (t < 1) rampa = requestAnimationFrame(paso);
+                else { rampa = null; rampaObjetivo = null; resolverRampa = null; ok(); }
+            }
+            rampa = requestAnimationFrame(paso);
+        });
+        return rampaPromesa;
+    }
+    /* rapido = true para una palabra suelta (fundidos cortos); si no, fundidos largos para una narración */
+    function atenuar(on, rapido) {
+        clearTimeout(soltar);
+        if (on) {
+            if (rampaObjetivo === NIVEL_BAJO && rampaPromesa) return rampaPromesa;     // ya está bajando: se espera a que acabe
+            return irA(NIVEL_BAJO, rapido ? 70 : 450);
+        }
+        if (!bloqueada) soltar = setTimeout(function () { irA(1, rapido ? 150 : 650); }, rapido ? 0 : 400);
+        return Promise.resolve();
+    }
+    function mantenerBajo(on) {
+        bloqueada = !!on;
+        if (on) return atenuar(true, false);
+        return atenuar(false, false);
+    }
+
     function silenciar() { actual = null; parar(); }
 
     /* Los navegadores no dejan sonar hasta el primer toque: entonces se reanuda lo pendiente */
@@ -112,6 +158,8 @@ window.Sonido = (function () {
         parar: silenciar,
         efecto: efecto,
         woosh: woosh,
+        atenuar: atenuar,
+        mantenerBajo: mantenerBajo,
         musicaActiva: function () { return musicaOn; },
         efectosActivos: function () { return efectosOn; },
         alternarMusica: function () {
