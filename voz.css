@@ -208,3 +208,11 @@ html.movil .ig-nav .ig-ico svg { width: 1.45em; height: 1.45em; }
 html.movil .ig-lienzo.con-clase .ig-insignia { font-size: 2.6rem; min-height: 5.5rem; }
 /* pantallas bajas (móviles pequeños): franja del resultado más baja, para no reducir el resto de la explicación */
 @media (max-height: 720px) { .ig-lienzo.con-clase .ig-insignia, html.movil .ig-lienzo.con-clase .ig-insignia { font-size: 2.3rem; min-height: 3.6rem; } }
+
+/* «Para repasar» (resultados): cada palabra centrada de verdad en su etiqueta (en iPhone la tipografía de títulos quedaba
+   descentrada con el alto de línea normal) y el bloque sin márgenes desiguales en móvil, para que el reparto de alturas
+   de la tarjeta lo deje a la misma distancia del texto de arriba y del de abajo */
+.res-repasar .pal { display: inline-flex; align-items: center; justify-content: center; line-height: 1; padding: 0.34rem 0.75rem; vertical-align: middle; }
+.res-repasar b { display: inline-block; margin-bottom: 0.3rem; }
+@media (max-width: 640px) { .res-repasar, .res-detail { margin-bottom: 0; } }
+html.movil .res-repasar, html.movil .res-detail { margin-bottom: 0; }

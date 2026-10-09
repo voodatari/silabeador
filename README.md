@@ -58,9 +58,9 @@ Salen del diccionario `es_ec` (Hunspell, ortografía de Ecuador) del proyecto Ac
 | Nivel | Frecuencia | Sílabas | Palabras |
 |---|---|---|---|
 | 1 | entre las 6.000 más usadas | hasta 3 | 2.250 |
-| 2 | entre las 16.000 más usadas | hasta 4 | 3.163 |
-| 3 | entre las 32.000 más usadas | hasta 5 | 3.762 |
-| 4 🔥 | palabras de los niveles 1-3 con hiato, diptongo o triptongo, o con grupos de consonantes difíciles (x, cc, tres consonantes seguidas…) | hasta 5 | 2.827 |
+| 2 | entre las 16.000 más usadas | hasta 4 | 3.166 |
+| 3 | entre las 32.000 más usadas | hasta 5 | 3.766 |
+| 4 🔥 | palabras de los niveles 1-3 con hiato, diptongo o triptongo, o con grupos de consonantes difíciles (x, cc, tres consonantes seguidas…) | hasta 5 | 2.829 |
 
 En el nivel 4 se elige primero el grupo (35 % hiatos, 35 % diptongos, 30 % consonantes), para que predominen las dificultades con vocales.
 

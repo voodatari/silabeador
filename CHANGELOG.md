@@ -4,8 +4,11 @@ Historial completo desde que empezó el proyecto (8 de octubre de 2026), no solo
 
 Formato de versión: `AAAA.MM.DD-letra`, igual que el número que llevan los archivos en `index.html`; desde la 2.0, número de versión (2.0, 2.0.1, 2.1…). Las fechas son las reales: algunas versiones de la primera tarde llevan «2026.10.09» en el nombre pero se hicieron el 8.
 
+## [2.1.4] - 2026-10-10
+- Resultados (iPhone): la lista «Para repasar» queda centrada: a la misma distancia del texto de arriba y del de abajo, y cada palabra centrada dentro de su etiqueta.
+
 ## [2.1.3] - 2026-10-10
-- Fuera de la lista los extranjerismos poco comunes o cuya separación en sílabas puede generar dudas: pizza, pizzería, zoo, ferry, curry, gamma, kappa, ballet, chalet, cabaret, debut, carnet, boutique, rouge, beige, amateur, complot, currículum (queda «currículo»), memorándum, médium; y un nombre propio que se había colado. Se quedan los de uso común y separación clara (robot, kilo, karaoke, búnker, cómic, déficit, álbum…).
+- Fuera de la lista los extranjerismos poco comunes o cuya separación en sílabas puede generar dudas: pizza, pizzería, zoo, ferry, curry, gamma, kappa, ballet, debut, boutique, rouge, beige y amateur; y un nombre propio que se había colado. Se quedan los de uso común y separación clara (robot, kilo, karaoke, búnker, cómic, chalet, carnet, currículum, déficit, álbum…).
 
 ## [2.1.2] - 2026-10-10
 - Voz: una sílaba que es solo una vocal con tilde (la «é» de «a-é-re-o») ya no se lee «e acentuada»: se dice la vocal. Lo mismo en frases como «Lleva tilde en la sílaba: é».
