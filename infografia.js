@@ -217,9 +217,9 @@ window.Infografia = (function () {
     }
 
     /* ---------- escena (los elementos animados) ---------- */
-    function Escena(raiz, A) {
+    function Escena(raiz, A, tipo) {
         var self = this;
-        this.A = A; this.raiz = raiz; this.timers = [];
+        this.A = A; this.raiz = raiz; this.timers = []; this.tipo = tipo;
         raiz.innerHTML = '';
 
         // palabra con huecos de corte entre letras
@@ -255,9 +255,26 @@ window.Infografia = (function () {
         var n = Math.min(hs.length, this.A.cortes.length + 2), i;
         hs.forEach(function (h) { h.style.transition = 'none'; });
         for (i = 0; i < n; i++) hs[i].classList.add('medir');
+        /* tónica y clasificar: se mide con lo que saldrá al final (píldoras, etiquetas «antepenúltima»… e insignia), que al
+           principio está vacío; si no, en móvil el final no cabía y se cortaba */
+        var etqs = this.chips().map(function (c) { return c.querySelector('.ig-etq'); }), guardado = null;
+        if (this.tipo !== 'silabas') {
+            guardado = { pild: this.pildorasEl.innerHTML, etqs: etqs.map(function (e) { return e.innerHTML; }), ins: this.insignia.textContent, insC: this.insignia.className };
+            if (!this.pildorasEl.innerHTML) this.pildorasEl.innerHTML = '<span class="ig-pill mal">✗ Tu respuesta <b>esdrújula</b></span><span class="ig-pill bien">✓ Correcta <b>esdrújula</b></span>';
+            etqs.forEach(function (e, k) { var pos = etqs.length - k; e.innerHTML = pos <= 3 ? '<span class="ig-num">' + pos + '</span> ' + I.ORDINAL[pos] : '▲ tónica'; });
+            this.insignia.textContent = I.NOMBRE[this.A.clase].toUpperCase(); this.insignia.className = 'ig-insignia ver ' + this.A.clase;
+        }
         l.style.zoom = 1;
-        function nocabe() { return raiz.scrollHeight > raiz.clientHeight + 1 || palabra.getBoundingClientRect().width > raiz.clientWidth - 6; }
+        var filas = [this.cols, this.pildorasEl];       // van en una sola fila: si no caben a lo ancho, se reduce todo
+        function nocabe() {
+            return raiz.scrollHeight > raiz.clientHeight + 1 || palabra.getBoundingClientRect().width > raiz.clientWidth - 6 ||
+                filas.some(function (f) { return f.scrollWidth > f.clientWidth + 1; });
+        }
         while (nocabe() && z > 0.35) { z -= 0.04; l.style.zoom = z.toFixed(2); }
+        if (guardado) {
+            this.pildorasEl.innerHTML = guardado.pild; etqs.forEach(function (e, k) { e.innerHTML = guardado.etqs[k]; });
+            this.insignia.textContent = guardado.ins; this.insignia.className = guardado.insC;
+        }
         for (i = 0; i < n; i++) hs[i].classList.remove('medir');
         void l.offsetWidth;
         hs.forEach(function (h) { h.style.transition = ''; });
@@ -468,7 +485,7 @@ window.Infografia = (function () {
             /* la escena tal como queda justo antes del paso i (los pasos anteriores se aplican de golpe) */
             function construirEscena(hasta) {
                 if (escena) escena.parar();
-                escena = new Escena(velo.querySelector('.ig-escenario'), A);
+                escena = new Escena(velo.querySelector('.ig-escenario'), A, datos.tipo);
                 escena.rapido = true;
                 for (var k = 0; k < hasta; k++) {
                     var x = beats[k];

@@ -2,6 +2,9 @@
 
 Formato de versión: `AAAA.MM.DD-letra`, igual que el número que llevan los archivos en `index.html`. Las versiones grandes llevan número propio (2.0).
 
+## [2.0.7] - 2026-10-09
+- Móvil: al final de la explicación de tónica o clasificar ya no se corta nada (las píldoras de arriba, las etiquetas «antepenúltima / penúltima / última» y la insignia «ESDRÚJULA»). El tamaño se calcula con ese contenido final, y sílabas y píldoras van siempre en una fila: si no caben, se reduce todo un poco.
+
 ## [2.0.6] - 2026-10-09
 - Se quita el botón 🔊 para repetir la palabra: no aportaba nada (la palabra ya se dice sola al aparecer).
 

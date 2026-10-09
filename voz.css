@@ -25,7 +25,7 @@
 .ig-punto.ahora { background: var(--secondary); box-shadow: 0 0 0.5rem var(--secondary); }
 
 .ig-escenario { position: relative; flex: 1 1 auto; min-height: 14rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; padding: 0.4rem 0; }
-.ig-pildoras { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; min-height: 2.1rem; }
+.ig-pildoras { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: nowrap; min-height: 2.1rem; white-space: nowrap; }
 .ig-pill { opacity: 0; padding: 0.35rem 0.9rem; border-radius: 2rem; font-size: 0.95rem; border: 1px solid; font-weight: 400; }
 .ig-pill b { font-family: var(--font-word); }
 .ig-pill.mal { color: var(--danger); border-color: rgba(255, 93, 143, 0.55); background: rgba(255, 93, 143, 0.1); }
@@ -61,7 +61,7 @@
 .ig-h.late .ig-h-linea { animation: igLate 0.8s ease-in-out 3; }
 @keyframes igLate { 50% { transform: translateX(-50%) scaleX(2.2); } }
 
-.ig-sils { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; min-height: 4.9rem; }
+.ig-sils { display: flex; gap: 1rem; justify-content: center; flex-wrap: nowrap; min-height: 4.9rem; }
 .ig-col { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; opacity: 0; transform: translateY(1rem) scale(0.9); transition: opacity 0.4s, transform 0.4s; }
 .ig-col.ver { opacity: 1; transform: none; }
 .ig-col.ver.apagada { opacity: 0.35; }
