@@ -242,11 +242,24 @@ window.Infografia = (function () {
         var top = el('div', 'ig-zona-palabra'); top.appendChild(this.bocadillo); top.appendChild(p);
         var lienzo = el('div', 'ig-lienzo');
         lienzo.appendChild(this.pildorasEl); lienzo.appendChild(top); lienzo.appendChild(this.cols); lienzo.appendChild(this.insignia);
+        if (tipo !== 'silabas') lienzo.classList.add('con-clase');      // reserva la franja centrada del resultado final (aguda, llana…)
         raiz.appendChild(lienzo);
         this.lienzo = lienzo;
         p.classList.add('oculta');
         this.encajar();
     }
+
+    /* iconos (SVG, estilo de los controles de reproducción de Windows 11): los emojis ◀ ⏸ ↻ ▶ ⏭ se veían mal */
+    var ICO = {
+        anterior: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="2.6" height="14" rx="1.3"/><path d="M19 6.6v10.8c0 .9-1 1.4-1.7.9l-7.8-5.4a1.1 1.1 0 0 1 0-1.8l7.8-5.4c.7-.5 1.7 0 1.7.9z"/></svg>',
+        siguiente: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="16.4" y="5" width="2.6" height="14" rx="1.3"/><path d="M5 6.6v10.8c0 .9 1 1.4 1.7.9l7.8-5.4a1.1 1.1 0 0 0 0-1.8L6.7 5.7C6 5.2 5 5.7 5 6.6z"/></svg>',
+        pausa: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4.2" height="14" rx="1.4"/><rect x="13.8" y="5" width="4.2" height="14" rx="1.4"/></svg>',
+        seguir: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.6v12.8c0 .9 1 1.4 1.7.9l9.6-6.4a1.1 1.1 0 0 0 0-1.8L9.7 4.7C9 4.2 8 4.7 8 5.6z"/></svg>',
+        repetir: '<svg viewBox="0 0 24 24" aria-hidden="true" class="trazo"><path d="M19 12a7 7 0 1 1-2.05-4.95"/><path d="M19.5 4.3v4.8h-4.8"/></svg>',
+        saltar: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.8v10.4c0 .8.9 1.3 1.6.8l6.6-5.2a1 1 0 0 0 0-1.6L4.6 6C3.9 5.5 3 6 3 6.8z"/><path d="M11 6.8v10.4c0 .8.9 1.3 1.6.8l6.6-5.2a1 1 0 0 0 0-1.6L12.6 6c-.7-.5-1.6 0-1.6.8z"/><rect x="19.4" y="5.5" width="2.2" height="13" rx="1.1"/></svg>',
+        flecha: '<svg viewBox="0 0 24 24" aria-hidden="true" class="trazo"><path d="M5 12h13.5"/><path d="M13 6.5l5.5 5.5-5.5 5.5"/></svg>'
+    };
+    function ico(n) { return '<span class="ig-ico">' + ICO[n] + '</span>'; }
     var P = Escena.prototype;
     /* si el contenido no cabe en el alto de la escena, se reduce (nada se corta por arriba ni por abajo) */
     P.encajar = function () {
@@ -434,12 +447,12 @@ window.Infografia = (function () {
                     '<div class="ig-escenario"></div>' +
                     '<div class="ig-subtitulo"></div>' +
                     '<div class="ig-nav">' +
-                        '<button type="button" class="btn-secondary ig-atras" aria-label="Paso anterior"><span class="ig-ico">◀</span><span class="ig-txt"> Atrás</span></button>' +
+                        '<button type="button" class="btn-secondary ig-atras" aria-label="Paso anterior">' + ico('anterior') + '<span class="ig-txt"> Atrás</span></button>' +
                         '<button type="button" class="btn-secondary ig-pausa" aria-label="Pausar al terminar este paso"></button>' +
-                        '<button type="button" class="btn-secondary ig-repetir" aria-label="Repetir este paso"><span class="ig-ico">↻</span><span class="ig-txt"> Repetir</span></button>' +
-                        '<button type="button" class="btn-secondary ig-adelante" aria-label="Paso siguiente"><span class="ig-txt">Adelante </span><span class="ig-ico">▶</span></button>' +
+                        '<button type="button" class="btn-secondary ig-repetir" aria-label="Repetir este paso">' + ico('repetir') + '<span class="ig-txt"> Repetir</span></button>' +
+                        '<button type="button" class="btn-secondary ig-adelante" aria-label="Paso siguiente"><span class="ig-txt">Adelante </span>' + ico('siguiente') + '</button>' +
                     '</div>' +
-                    '<div class="dialog-actions ig-acciones"><button type="button" class="btn-primary ig-ok">Saltar ⏭</button></div>' +
+                    '<div class="dialog-actions ig-acciones"><button type="button" class="btn-primary ig-ok">Saltar ' + ico('saltar') + '</button></div>' +
                 '</div>';
             document.body.appendChild(velo);
 
@@ -474,11 +487,11 @@ window.Infografia = (function () {
                 [].forEach.call(puntos.children, function (p, k) { p.className = 'ig-punto' + (k < idx || finTotal ? ' hecho' : '') + (k === idx && !finTotal ? ' ahora' : ''); });
                 botonAtras.disabled = idx <= 0;
                 botonAdelante.disabled = idx >= total - 1;
-                botonOk.textContent = terminado && idx >= total - 1 ? '¡Entendido! Siguiente ➜' : 'Saltar ⏭';
-                var etiqueta = detenido ? '⏸ en pausa' : pausaPedida ? '⏸ se parará al terminar este paso' : manual ? '✋ manual' : '';
+                botonOk.innerHTML = terminado && idx >= total - 1 ? '¡Entendido! Siguiente ' + ico('flecha') : 'Saltar ' + ico('saltar');
+                var etiqueta = detenido ? 'en pausa' : pausaPedida ? 'se parará al terminar este paso' : manual ? 'modo manual' : '';
                 estadoVoz.textContent = (vozTexto || '') + (etiqueta ? (vozTexto ? ' · ' : '') + etiqueta : '');
                 var seguir = manual || pausaPedida;
-                botonPausa.innerHTML = seguir ? '<span class="ig-ico">▶</span><span class="ig-txt"> Seguir</span>' : '<span class="ig-ico">⏸</span><span class="ig-txt"> Pausa</span>';
+                botonPausa.innerHTML = seguir ? ico('seguir') + '<span class="ig-txt"> Seguir</span>' : ico('pausa') + '<span class="ig-txt"> Pausa</span>';
                 botonPausa.setAttribute('aria-label', seguir ? 'Seguir con la explicación' : 'Pausar al terminar este paso');
                 botonPausa.disabled = idx >= total - 1 && terminado;
             }

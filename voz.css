@@ -191,3 +191,20 @@ html.movil body:has(#screen-home.active) .gear-btn { right: auto; left: max(0.6r
 .screen, .screen.active { opacity: 1; transform: none; transition: none; }
 .screen > * { opacity: 0; transform: scale(0.95); transition: opacity 0.4s ease, transform 0.4s ease; }
 .screen.active > * { opacity: 1; transform: none; }
+
+/* iconos SVG de la explicación (antes emojis) */
+.ig-ico { display: inline-flex; align-items: center; justify-content: center; }
+.ig-ico svg { width: 1.15em; height: 1.15em; fill: currentColor; display: block; }
+.ig-ico svg.trazo { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.ig-nav button { display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem; }
+.ig-ok { display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; }
+@media (max-width: 640px) { .ig-nav .ig-ico svg { width: 1.45em; height: 1.45em; } }
+html.movil .ig-nav .ig-ico svg { width: 1.45em; height: 1.45em; }
+
+/* resultado final (AGUDA / LLANA / ESDRÚJULA): más grande y en una franja reservada desde el principio, centrada entre las
+   sílabas y el texto de abajo (si no, en móvil quedaba arriba con mucho hueco debajo). Solo en tónica y clasificar. */
+.ig-lienzo.con-clase .ig-insignia { font-size: 3rem; min-height: 6.5rem; display: flex; align-items: center; justify-content: center; }
+@media (max-width: 640px) { .ig-lienzo.con-clase .ig-insignia { font-size: 2.6rem; min-height: 5.5rem; } }
+html.movil .ig-lienzo.con-clase .ig-insignia { font-size: 2.6rem; min-height: 5.5rem; }
+/* pantallas bajas (móviles pequeños): franja del resultado más baja, para no reducir el resto de la explicación */
+@media (max-height: 720px) { .ig-lienzo.con-clase .ig-insignia, html.movil .ig-lienzo.con-clase .ig-insignia { font-size: 2.3rem; min-height: 3.6rem; } }
