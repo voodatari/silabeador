@@ -2,6 +2,9 @@
 
 Formato de versión: `AAAA.MM.DD-letra`, igual que el número que llevan los archivos en `index.html`. Las versiones grandes llevan número propio (2.0).
 
+## [2.0.6] - 2026-10-09
+- Se quita el botón 🔊 para repetir la palabra: no aportaba nada (la palabra ya se dice sola al aparecer).
+
 ## [2.0.5] - 2026-10-09
 - Si un fallo termina la partida (muerte súbita, o la última vida en supervivencia), durante su explicación ya suena la música de «partida terminada», que sigue sin cortes en la pantalla de resultados.
 

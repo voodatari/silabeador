@@ -141,8 +141,6 @@ const app = {
         });
 
         this.$('btn-abort').addEventListener('click', () => this.abortar());
-        this.$('btn-oir').addEventListener('click', () => { if (this.state.q) Voz.decir(this.state.q.A.palabra, vozPalabra(this.state.q.A)); });
-        VozUI.alCambiar(() => this.actualizarBotonOir());
         this.$('btn-retry').addEventListener('click', () => { Sonido.efecto('click'); this.startGame(); });
         this.$('btn-otra-actividad').addEventListener('click', () => this.showScreen('screen-config'));   // el mismo modo, otra actividad / nivel
         this.$('btn-change-name').addEventListener('click', () => this.abrirCambioNombre());
@@ -392,14 +390,9 @@ const app = {
         }
     },
 
-    actualizarBotonOir() {
-        this.$('btn-oir').classList.toggle('hidden', !VozUI.palabras() || Voz.estado() === 'error');
-    },
-
     pintarPregunta() {
         const q = this.state.q, A = q.A, area = this.$('question-area'), texto = this.$('question-text');
         area.classList.remove('bloqueado');
-        this.actualizarBotonOir();
 
         // indicador de pasos (solo en «Todo junto»)
         const ind = this.$('step-indicator');
