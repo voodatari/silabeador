@@ -179,3 +179,11 @@ function showDialog(opts) {
 
 function confirmDialog(message, options) { return showDialog(Object.assign({ message: message }, options || {})); }
 function alertDialog(message, options) { return showDialog(Object.assign({ message: message, cancelText: '' }, options || {})); }
+
+/* Ventanas (.modal-overlay: opciones, cambiar nombre): se cierran con la animación inversa a la de abrir */
+function cerrarModal(m) {
+    if (!m || m.classList.contains('hidden') || m.classList.contains('cerrando')) return;
+    m.classList.add('cerrando');
+    setTimeout(function () { m.classList.add('hidden'); m.classList.remove('cerrando'); }, 220);
+}
+function abrirModal(m) { if (m) { m.classList.remove('cerrando'); m.classList.remove('hidden'); } }

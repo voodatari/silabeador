@@ -145,7 +145,7 @@ const app = {
         this.$('btn-retry').addEventListener('click', () => { Sonido.efecto('click'); this.startGame(); });
         this.$('btn-otra-actividad').addEventListener('click', () => this.showScreen('screen-config'));   // el mismo modo, otra actividad / nivel
         this.$('btn-change-name').addEventListener('click', () => this.abrirCambioNombre());
-        this.$('btn-name-cancel').addEventListener('click', () => { Sonido.efecto('click'); this.$('modal-change-name').classList.add('hidden'); });
+        this.$('btn-name-cancel').addEventListener('click', () => { Sonido.efecto('click'); cerrarModal(this.$('modal-change-name')); });
         this.$('btn-name-ok').addEventListener('click', () => this.confirmarNombre());
         this.$('new-player-name').addEventListener('keydown', e => { if (e.key === 'Enter') this.confirmarNombre(); });
 
@@ -209,7 +209,7 @@ const app = {
         Sonido.efecto('click');
         const input = this.$('new-player-name');
         input.value = this.state.playerName;
-        this.$('modal-change-name').classList.remove('hidden');
+        abrirModal(this.$('modal-change-name'));
         input.focus();
     },
     confirmarNombre() {
@@ -220,7 +220,7 @@ const app = {
         this.guardar('nombre', val);
         this.$('player-name').value = val;
         this.$('btn-start').disabled = false;
-        this.$('modal-change-name').classList.add('hidden');
+        cerrarModal(this.$('modal-change-name'));
     },
 
     // --- PALABRAS ---

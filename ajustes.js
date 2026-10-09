@@ -18,8 +18,8 @@
     }
     pintar();
 
-    function abrir() { Sonido.efecto('click'); modal.classList.remove('hidden'); }
-    function cerrar() { modal.classList.add('hidden'); }
+    function abrir() { Sonido.efecto('click'); abrirModal(modal); }
+    function cerrar() { cerrarModal(modal); }          // con animación de salida (efectos.js)
 
     document.getElementById('settings-button').addEventListener('click', abrir);
     modal.querySelector('.close-x').addEventListener('click', function () { Sonido.efecto('click'); cerrar(); });

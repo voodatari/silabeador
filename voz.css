@@ -216,3 +216,9 @@ html.movil .ig-lienzo.con-clase .ig-insignia { font-size: 2.6rem; min-height: 5.
 .res-repasar b { display: inline-block; margin-bottom: 0.3rem; }
 @media (max-width: 640px) { .res-repasar, .res-detail { margin-bottom: 0; } }
 html.movil .res-repasar, html.movil .res-detail { margin-bottom: 0; }
+
+/* ventanas (opciones, cambiar nombre): entran y salen con animación (antes al cerrar desaparecían de golpe) */
+.modal-overlay { animation: fade-in 0.2s ease both; }
+.modal-overlay.cerrando { animation: fade-out 0.22s ease forwards; pointer-events: none; }
+.modal-overlay.cerrando > .glass-panel { animation: modal-out 0.22s ease both; }
+@keyframes modal-out { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(1.5rem) scale(0.94); } }
