@@ -4,6 +4,9 @@ Historial completo desde que empezó el proyecto (8 de octubre de 2026), no solo
 
 Formato de versión: `AAAA.MM.DD-letra`, igual que el número que llevan los archivos en `index.html`; desde la 2.0, número de versión (2.0, 2.0.1, 2.1…). Las fechas son las reales: algunas versiones de la primera tarde llevan «2026.10.09» en el nombre pero se hicieron el 8.
 
+## [2.1.6] - 2026-10-10
+- El nombre es opcional: si no se escribe, se juega como «Anónimo» (también en el ranking). Ese nombre no se guarda, así que la próxima vez el campo aparece vacío.
+
 ## [2.1.5] - 2026-10-10
 - Las ventanas de opciones y de cambiar el nombre se cierran con animación (la inversa a la de abrir), en vez de desaparecer de golpe.
 

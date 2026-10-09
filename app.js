@@ -42,6 +42,7 @@ const app = {
     PASOS_COMBINADA: ['silabas', 'tonica', 'clasificar'],
     // Cuenta atrás 3-2-1 antes de empezar: desactivada hasta que haya un modo con base de datos (ranking compartido)
     CUENTA_ATRAS: false,
+    ANONIMO: 'Anónimo',
     MULT_NIVEL: { 1: 1, 2: 1.5, 3: 2, 4: 2.5 },
     DESC_NIVEL: {
         1: 'Nivel 1 · palabras muy frecuentes, de hasta 3 sílabas.',
@@ -93,7 +94,7 @@ const app = {
     init() {
         const nameInput = this.$('player-name'), btnStart = this.$('btn-start');
         const guardado = this.leer('nombre', '');
-        if (guardado) { nameInput.value = guardado; this.state.playerName = guardado; btnStart.disabled = false; }
+        if (guardado) { nameInput.value = guardado; this.state.playerName = guardado; }
 
         const cfg = this.leer('config', {});
         if (this.TIPOS[cfg.actividad]) this.state.actividad = cfg.actividad;
@@ -102,14 +103,15 @@ const app = {
 
         nameInput.addEventListener('input', e => {
             this.state.playerName = e.target.value.trim();
-            btnStart.disabled = this.state.playerName.length === 0;
         });
         const empezar = () => {
-            if (!this.state.playerName) return;
-            this.guardar('nombre', this.state.playerName);
+            // sin nombre se juega como «Anónimo» (y no se guarda: la próxima vez el campo sale vacío)
+            const nombre = nameInput.value.trim();
+            this.state.playerName = nombre || this.ANONIMO;
+            this.guardar('nombre', nombre);
             this.showScreen('screen-modes');
         };
-        nameInput.addEventListener('keydown', e => { if (e.key === 'Enter' && !btnStart.disabled) { nameInput.blur(); empezar(); } });
+        nameInput.addEventListener('keydown', e => { if (e.key === 'Enter') { nameInput.blur(); empezar(); } });
         btnStart.addEventListener('click', empezar);
 
         document.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => this.showScreen(b.dataset.go)));
@@ -208,15 +210,14 @@ const app = {
     abrirCambioNombre() {
         Sonido.efecto('click');
         const input = this.$('new-player-name');
-        input.value = this.state.playerName;
+        input.value = this.state.playerName === this.ANONIMO ? '' : this.state.playerName;
         abrirModal(this.$('modal-change-name'));
         input.focus();
     },
     confirmarNombre() {
         Sonido.efecto('click');
         const val = this.$('new-player-name').value.trim();
-        if (!val) { restartAnimation(this.$('new-player-name'), 'shake'); return; }
-        this.state.playerName = val;
+        this.state.playerName = val || this.ANONIMO;       // vacío: «Anónimo»
         this.guardar('nombre', val);
         this.$('player-name').value = val;
         this.$('btn-start').disabled = false;
