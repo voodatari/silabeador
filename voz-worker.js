@@ -91,7 +91,11 @@ async function crearFonemizador() {
     });
     llamadas = 0;
 }
+/* una vocal con tilde SOLA («é», p. ej. la sílaba «é-» de «a-é-re-o» o «Lleva tilde en la sílaba: é») espeak la lee como el
+   nombre de la letra: «e acentuada». Se manda sin tilde; la tónica la marca el juego por su cuenta (acento, tono y duración). */
+var VOCAL_SOLA = /(^|[\s,.:;¿¡"«(-])([áéíóú])(?=$|[\s,.:;!?"»)-])/g, SIN_TILDE = { 'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u' };
 async function fonemas(texto) {
+    texto = String(texto).replace(VOCAL_SOLA, function (m, antes, v) { return antes + SIN_TILDE[v]; });
     if (cacheFonemas[texto]) return cacheFonemas[texto].slice();
     if (llamadas >= MAX_LLAMADAS) await crearFonemizador();
     for (var intento = 0; intento < 3; intento++) {
