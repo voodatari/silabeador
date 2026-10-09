@@ -24,7 +24,7 @@ No necesita cuentas ni base de datos: el ranking, el nombre y los ajustes se gua
 - **Supervivencia:** tres vidas y un reloj por pregunta que se acelera.
 - **Práctica:** sin presión. Cuando se falla se abre una explicación que cuenta por qué está mal y cómo se hace, paso a paso.
 
-En ⚙️ Opciones, **«Explicar los fallos»** decide cuándo se explica un error: *No*, *En práctica* (por defecto) o *Siempre*. En *Siempre*, en los otros tres modos el juego se pausa por completo (también el reloj) mientras dura la explicación.
+En ⚙️ Opciones, **«Explicar los fallos»** decide cuándo se explica un error: *No*, *En práctica* o *Siempre* (por defecto). En *Siempre*, en los otros tres modos el juego se pausa por completo (también el reloj) mientras dura la explicación.
 
 Hay tres **niveles** (más frecuentes y cortas → menos habituales y largas) y un modo mixto. La puntuación se multiplica por 1, 1,5 o 2 según el nivel de la palabra.
 

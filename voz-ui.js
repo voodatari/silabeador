@@ -2,7 +2,7 @@
    Voz · interfaz: opciones e indicador de carga
    - «Voz en las palabras»: pronuncia cada palabra nueva (activada por defecto)
    - «Explicación animada con voz»: al fallar se muestra la infografía animada narrada (si no, la explicación escrita)
-   - «Explicar los fallos»: No · En práctica (por defecto) · Siempre (también en contrarreloj, muerte súbita y supervivencia: el juego se pausa)
+   - «Explicar los fallos»: No · En práctica · Siempre (por defecto; también en contrarreloj, muerte súbita y supervivencia: el juego se pausa)
    El motor (Piper) se carga entero al entrar en la web y se queda en memoria; los ajustes se guardan en localStorage.
    ========================================================= */
 window.VozUI = (function () {
@@ -14,7 +14,7 @@ window.VozUI = (function () {
 
     var palabras = leer(K_PAL) !== '0';
     var explica = leer(K_EXP) !== '0';        // activada por defecto
-    var cuando = leer(K_CUANDO); if (['no', 'practica', 'siempre'].indexOf(cuando) < 0) cuando = 'practica';
+    var cuando = leer(K_CUANDO); if (['no', 'practica', 'siempre'].indexOf(cuando) < 0) cuando = 'siempre';     // por defecto: en todos los modos
     var alCambiar = null;
     var chip = $('voz-carga'), texto = $('voz-carga-texto'), barra = $('voz-carga-barra');
     var botonPal = $('voz-palabras-button'), botonExp = $('voz-explica-button'), segCuando = $('explicar-seg');
