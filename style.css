@@ -448,11 +448,8 @@ html.ligero .glass-panel, html.ligero .game-hud { background: rgba(20, 44, 54, 0
 html.ligero .modal-overlay, html.ligero .dialog-overlay { background: rgba(6, 16, 22, 0.9); }
 html.ligero .logo-title { animation: none; }
 
-@media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition: none !important; }
-}
-/* el relleno amarillo de la línea de corte es un efecto muy breve y pequeño: se mantiene también con «reducir movimiento» */
-@media (prefers-reduced-motion: reduce) { .palanca .linea::after { transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.3, 1) !important; } }
+
+
 
 
 /* ---------- Pantallas estrechas (móvil) ---------- */
@@ -720,11 +717,4 @@ html.movil #screen-home .stack { margin-bottom: 0.6rem; }
 html.movil .step-indicator { margin-bottom: 0.55rem; }
 html.movil .step-indicator:empty { margin-bottom: 0; }
 
-/* «Reducir movimiento»: los avisos que informan al jugador (¡Velocidad luz!, +10…) no se apagan:
-   se muestran con un simple fundido, sin desplazarse ni cambiar de tamaño */
-@keyframes aviso-fundido { 0% { opacity: 0; } 15% { opacity: 1; } 75% { opacity: 1; } 100% { opacity: 0; } }
-@media (prefers-reduced-motion: reduce) {
-    .speed-popup { animation: aviso-fundido 1.2s ease forwards !important; transform: translateY(-2.5rem); }
-    .float-text { animation: aviso-fundido 0.95s ease forwards !important; transform: translate(-50%, -80%); }
-    .streak-pop { animation: none !important; }
-}
+

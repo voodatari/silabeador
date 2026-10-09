@@ -2,8 +2,8 @@
 
 Formato de versión: `AAAA.MM.DD-letra`, igual que el número que llevan los archivos en `index.html`.
 
-## [2026.10.09-w] - 2026-10-09
-- Corrige que los avisos de juego («¡Velocidad luz!», «¡Qué rápido!», «+10») no se vieran en ordenadores con las animaciones del sistema desactivadas (Windows: «Mostrar animaciones» en off, que el navegador interpreta como «reducir movimiento»). Ahora se muestran con un simple fundido, sin movimiento.
+## [2026.10.09-x] - 2026-10-09
+- El juego ignora el ajuste de Windows «Mostrar animaciones» (`prefers-reduced-motion`) y se muestra siempre como fue diseñado, sin versión alternativa. Esto corrige que los avisos de juego («¡Velocidad luz!», «¡Qué rápido!», «+10») no se vieran en ordenadores con ese ajuste desactivado.
 
 ## [2026.10.09-v] - 2026-10-09
 - Cortador: todos los botones de corte de una misma palabra tienen el mismo tamaño (el más pequeño que haga falta), para no distraer.
