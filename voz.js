@@ -46,7 +46,7 @@ window.Voz = (function () {
         if (!window.Worker || !window.WebAssembly) { estado = 'error'; error = new Error('Este navegador no admite WebAssembly'); avisarProgreso(0); return Promise.reject(error); }
         estado = 'cargando';
         promesaCarga = new Promise(function (ok, mal) {
-            try { worker = new Worker('voz-worker.js'); } catch (e) { estado = 'error'; error = e; promesaCarga = null; return mal(e); }
+            try { worker = new Worker('voz-worker.js?v=20261012c'); } catch (e) { estado = 'error'; error = e; promesaCarga = null; return mal(e); }
             worker.onmessage = function (ev) {
                 var m = ev.data;
                 if (m.t === 'progreso') avisarProgreso(m.f);

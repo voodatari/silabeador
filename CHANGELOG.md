@@ -4,6 +4,9 @@ Historial completo desde que empezó el proyecto (8 de octubre de 2026), no solo
 
 Formato de versión: `AAAA.MM.DD-letra`, igual que el número que llevan los archivos en `index.html`; desde la 2.0, número de versión (2.0, 2.0.1, 2.1…). Las fechas son las reales: algunas versiones de la primera tarde llevan «2026.10.09» en el nombre pero se hicieron el 8.
 
+## [2.1.7] - 2026-10-11
+- Voz: nunca más «acentuada». La sílaba «ís» de «he-ro-ís-mo» se leía «i acentuada ese» (y «ás», «és», «ús» igual, y las mayúsculas): espeak lee como el nombre de la letra una vocal con tilde sola y esas sílabas. Se comprobó con el propio espeak (821 sílabas con tilde; solo fallaban esas) y ahora se mandan sin tilde (la tónica ya la marca el juego con su acento, tono y duración).
+
 ## [2.1.6] - 2026-10-10
 - El nombre es opcional: si no se escribe, se juega como «Anónimo» (también en el ranking). Ese nombre no se guarda, así que la próxima vez el campo aparece vacío.
 

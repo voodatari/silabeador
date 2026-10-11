@@ -91,11 +91,12 @@ async function crearFonemizador() {
     });
     llamadas = 0;
 }
-/* una vocal con tilde SOLA («é», p. ej. la sílaba «é-» de «a-é-re-o» o «Lleva tilde en la sílaba: é») espeak la lee como el
-   nombre de la letra: «e acentuada». Se manda sin tilde; la tónica la marca el juego por su cuenta (acento, tono y duración). */
-var VOCAL_SOLA = /(^|[\s,.:;¿¡"«(-])([áéíóú])(?=$|[\s,.:;!?"»)-])/g, SIN_TILDE = { 'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u' };
+/* espeak lee como el NOMBRE de la letra («i acentuada», «a acentuada»…) una vocal con tilde SOLA (á é í ú, también en mayúscula) y también
+   las sílabas «ás» «és» «ís» «ús» (la sílaba «ís» de «he-ro-ís-mo» sonaba «i acentuada ese»). Se manda sin tilde: la tónica la marca el
+   juego por su cuenta (acento, tono y duración). Comprobado con espeak: con «ó» y con el resto de sílabas con tilde no pasa. */
+var VOCAL_SOLA = /(^|[^\p{L}])([áéíóúÁÉÍÓÚ])([sS]?)(?![\p{L}])/gu, SIN_TILDE = { 'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u', 'Á': 'A', 'É': 'E', 'Í': 'I', 'Ó': 'O', 'Ú': 'U' };
 async function fonemas(texto) {
-    texto = String(texto).replace(VOCAL_SOLA, function (m, antes, v) { return antes + SIN_TILDE[v]; });
+    texto = String(texto).replace(VOCAL_SOLA, function (m, antes, v, s) { return antes + SIN_TILDE[v] + s; });
     if (cacheFonemas[texto]) return cacheFonemas[texto].slice();
     if (llamadas >= MAX_LLAMADAS) await crearFonemizador();
     for (var intento = 0; intento < 3; intento++) {
