@@ -147,6 +147,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
 .activity-card:hover { border-color: var(--primary); background: rgba(255, 138, 91, 0.1); }
 .activity-card.selected { border-color: var(--secondary); background: rgba(110, 231, 208, 0.1); box-shadow: 0 0 1.2rem rgba(110, 231, 208, 0.25); }
 .activity-card.selected strong { color: var(--secondary); }
+.activity-card.card-wide { grid-column: 1 / -1; }
 
 .config-row { display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap; margin: 0.6rem 0; }
 .config-label { font-family: var(--font-display); font-size: 0.8rem; letter-spacing: 0.1rem; color: var(--text-muted); text-transform: uppercase; min-width: 4.5rem; text-align: right; }
@@ -202,6 +203,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
     font-family: var(--font-word); font-weight: 700; font-size: 3.4rem; letter-spacing: 0.08rem; text-align: center;
     color: #fff; text-shadow: 0 0 1.4rem rgba(255, 138, 91, 0.55); word-break: keep-all; animation: q-pop 0.35s ease both;
 }
+#palabra-tilde-display { font-size: 2.8rem; margin-bottom: -0.2rem; }
 @keyframes q-pop { 0% { opacity: 0; transform: scale(0.7) rotate(-3deg); } 100% { opacity: 1; transform: none; } }
 .sil-fila { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 0.5rem; }
 .sil-chip {
@@ -279,7 +281,16 @@ button.sil-chip:hover { border-color: var(--secondary); background: rgba(110, 23
 .option-btn:active { transform: translateY(0.1rem); }
 .option-btn.correct { background: rgba(91, 227, 161, 0.25); border-color: var(--good); box-shadow: 0 0 1.2rem rgba(91, 227, 161, 0.5); animation: correctPop 0.3s ease; }
 .option-btn.wrong { background: rgba(255, 93, 143, 0.3); border-color: var(--danger); box-shadow: 0 0 1.2rem rgba(255, 93, 143, 0.5); animation: wrongShake 0.4s ease; }
-.bloqueado .option-btn, .bloqueado .sil-chip { pointer-events: none; }
+.bloqueado .option-btn, .bloqueado .sil-chip, .bloqueado .btn-no-tilde { pointer-events: none; }
+.acciones-tilde { display: flex; justify-content: center; width: 100%; margin-top: 0.8rem; }
+.btn-no-tilde {
+    background: rgba(0, 0, 0, 0.35); border: 2px solid var(--glass-border); color: #fff;
+    font-family: var(--font-display); font-size: 1.15rem; padding: 0.8rem 1.6rem; border-radius: 1.2rem;
+    max-width: 18rem; width: 100%; transition: all 0.2s ease; cursor: pointer;
+}
+.btn-no-tilde:hover { border-color: var(--secondary); background: rgba(110, 231, 208, 0.12); transform: translateY(-0.15rem); }
+.btn-no-tilde.correct { background: rgba(91, 227, 161, 0.25); border-color: var(--good); box-shadow: 0 0 1.2rem rgba(91, 227, 161, 0.5); animation: correctPop 0.3s ease; }
+.btn-no-tilde.wrong { background: rgba(255, 93, 143, 0.3); border-color: var(--danger); box-shadow: 0 0 1.2rem rgba(255, 93, 143, 0.5); animation: wrongShake 0.4s ease; }
 @keyframes correctPop { 0% { transform: scale(1); } 50% { transform: scale(1.06); } 100% { transform: scale(1); } }
 @keyframes wrongShake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-0.35rem); } 40%, 80% { transform: translateX(0.35rem); } }
 

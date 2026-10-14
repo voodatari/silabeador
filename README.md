@@ -15,7 +15,8 @@ No necesita cuentas ni base de datos: el ranking, el nombre y los ajustes se gua
 | Clasificar | Decidir si la palabra es esdrújula, llana o aguda. |
 | Dividir en sílabas | Cortar la palabra pulsando los botones-tijera entre las letras. |
 | Sílaba tónica | Tocar la sílaba que suena más fuerte. |
-| Todo junto | Las tres seguidas sobre la misma palabra: sílabas, tónica y clase. |
+| ¿Lleva tilde? | Señalar en qué sílaba debe llevar tilde o si va sin tilde. |
+| Todo junto | Las cuatro seguidas sobre la misma palabra: sílabas, tónica, clase y tilde. |
 
 ## Modos
 

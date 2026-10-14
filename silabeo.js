@@ -275,9 +275,100 @@
         return 'tilde no justificada (' + a.clase + ', termina en ' + a.terminacion + ')';
     }
 
+    function esHiatoAcentual(a) {
+        if (!a.tilde || a.tildeEn < 0) return false;
+        var t = a.silabas[a.tildeEn];
+        if (!t) return false;
+        var m = t.search(/[íú]/);
+        if (m < 0) return false;
+        var w = a.palabra;
+        var idx = 0;
+        for (var i = 0; i < a.tildeEn; i++) idx += a.silabas[i].length;
+        var pos = idx + m;
+        var ant = w[pos - 1], ant2 = w[pos - 2], sig = w[pos + 1];
+        if ((ant && FUERTES.indexOf(ant) >= 0) || (ant === 'h' && ant2 && FUERTES.indexOf(ant2) >= 0) || (sig && FUERTES.indexOf(sig) >= 0)) {
+            return true;
+        }
+        return false;
+    }
+
+    function explicarTilde(a) {
+        if (esHiatoAcentual(a)) {
+            return {
+                regla: 'Hiato acentual',
+                detalle: 'lleva tilde para deshacer el diptongo (hiato con vocal débil tónica)',
+                voz: 'Lleva tilde para deshacer el diptongo. Es un hiato con vocal débil tónica.',
+                tipo: 'hiato'
+            };
+        }
+        if (a.clase === 'esdrujula' || a.clase === 'sobresdrujula') {
+            return {
+                regla: 'Esdrújula',
+                detalle: 'las palabras esdrújulas siempre llevan tilde',
+                voz: 'Es una palabra esdrújula, y todas las esdrújulas llevan tilde siempre.',
+                tipo: 'esdrujula'
+            };
+        }
+        if (a.clase === 'monosilaba') {
+            return {
+                regla: 'Monosílaba',
+                detalle: a.tilde ? 'monosílaba con tilde diacrítica' : 'las palabras monosílabas no llevan tilde',
+                voz: a.tilde ? 'Es monosílaba con tilde diacrítica.' : 'Las palabras monosílabas no llevan tilde.',
+                tipo: 'monosilaba'
+            };
+        }
+        var ult = a.palabra[a.palabra.length - 1];
+        var termDesc = a.terminacion === 'vocal' ? 'vocal' : ('«' + a.terminacion + '»');
+        var termVoz = a.terminacion === 'vocal' ? 'vocal' : (a.terminacion === 'n' ? 'ene' : 'ese');
+        var letrasVoz = { b: 'be', c: 'ce', d: 'de', f: 'efe', g: 'ge', h: 'hache', j: 'jota', k: 'ka', l: 'ele', m: 'eme', n: 'ene', 'ñ': 'eñe', p: 'pe', q: 'cu', r: 'erre', s: 'ese', t: 'te', v: 'uve', w: 'uve doble', x: 'equis', y: 'i griega', z: 'zeta' };
+        var nombreUlt = letrasVoz[ult] || ult;
+        if (a.clase === 'aguda') {
+            if (a.tilde) {
+                return {
+                    regla: 'Aguda con tilde',
+                    detalle: 'aguda terminada en ' + termDesc,
+                    voz: 'Es aguda y termina en ' + termVoz + ', por lo que sí lleva tilde.',
+                    tipo: 'aguda_si'
+                };
+            } else {
+                return {
+                    regla: 'Aguda sin tilde',
+                    detalle: 'aguda terminada en «' + ult + '» (consonante distinta de «n» o «s»)',
+                    voz: 'Es aguda y termina en ' + nombreUlt + ', por lo que no lleva tilde.',
+                    tipo: 'aguda_no'
+                };
+            }
+        }
+        if (a.clase === 'llana') {
+            if (a.tilde) {
+                return {
+                    regla: 'Llana con tilde',
+                    detalle: 'llana terminada en «' + ult + '» (consonante distinta de «n» o «s»)',
+                    voz: 'Es llana y termina en ' + nombreUlt + ', no en vocal, ene o ese, por lo que sí lleva tilde.',
+                    tipo: 'llana_si'
+                };
+            } else {
+                return {
+                    regla: 'Llana sin tilde',
+                    detalle: 'llana terminada en ' + termDesc,
+                    voz: 'Es llana y termina en ' + termVoz + ', por lo que no lleva tilde.',
+                    tipo: 'llana_no'
+                };
+            }
+        }
+        return {
+            regla: 'Regla general',
+            detalle: a.tilde ? 'esta palabra lleva tilde' : 'esta palabra no lleva tilde',
+            voz: a.tilde ? 'Esta palabra lleva tilde.' : 'Esta palabra no lleva tilde.',
+            tipo: 'general'
+        };
+    }
+
     return {
         analizar: analizar,
         revisarTilde: revisarTilde,
+        esHiatoAcentual: esHiatoAcentual,
+        explicarTilde: explicarTilde,
         quitarTildes: quitarTildes,
         tieneTilde: tieneTilde,
         excepciones: EXCEPCIONES

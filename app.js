@@ -1,6 +1,6 @@
 /**
  * Silabeador · navegación, partida, resultados y ranking local
- * Actividades: clasificar (aguda/llana/esdrújula) · silabas (dividir) · tonica · combinada (las tres seguidas)
+ * Actividades: clasificar (aguda/llana/esdrújula) · silabas (dividir) · tonica · tilde (¿lleva tilde?) · combinada (todas seguidas)
  * Modos: timeattack · sudden_death · survival · practice (con explicación de cada error; en los demás modos, si en Opciones
  *        «Explicar los fallos» está en «Siempre», el juego se pausa por completo —también el reloj— mientras se explica el fallo)
  */
@@ -35,11 +35,12 @@ const app = {
         clasificar: { nombre: 'Clasificar', velocidad: [2000, 4000] },
         silabas: { nombre: 'Dividir en sílabas', velocidad: [5000, 9000] },
         tonica: { nombre: 'Sílaba tónica', velocidad: [2500, 5000] },
+        tilde: { nombre: '¿Lleva tilde?', velocidad: [2000, 4500] },
         combinada: { nombre: 'Todo junto', velocidad: [3000, 6000] }
     },
     MODOS: { timeattack: 'CONTRARRELOJ', sudden_death: 'MUERTE SÚBITA', survival: 'SUPERVIVENCIA', practice: 'PRÁCTICA' },
     CLASES: { aguda: 'aguda', llana: 'llana', esdrujula: 'esdrújula' },
-    PASOS_COMBINADA: ['silabas', 'tonica', 'clasificar'],
+    PASOS_COMBINADA: ['silabas', 'tonica', 'clasificar', 'tilde'],
     // Cuenta atrás 3-2-1 antes de empezar: desactivada hasta que haya un modo con base de datos (ranking compartido)
     CUENTA_ATRAS: false,
     ANONIMO: 'Anónimo',
@@ -242,9 +243,15 @@ const app = {
         const datos = { grupos: {} }, todas = [];
         Object.keys(grupos).forEach(g => {
             const porClase = { aguda: [], llana: [], esdrujula: [] };
-            grupos[g].forEach(a => { if (porClase[a.clase]) porClase[a.clase].push(a); todas.push(a); });
-            datos.grupos[g] = { lista: grupos[g], porClase };
+            const porTilde = { con: [], sin: [] };
+            grupos[g].forEach(a => {
+                if (porClase[a.clase]) porClase[a.clase].push(a);
+                if (a.tilde) porTilde.con.push(a); else porTilde.sin.push(a);
+                todas.push(a);
+            });
+            datos.grupos[g] = { lista: grupos[g], porClase, porTilde };
         });
+        datos.porTilde = { con: todas.filter(a => a.tilde), sin: todas.filter(a => !a.tilde) };
         datos.lista = todas;
         return (this._datos[4] = datos);
     },
@@ -254,8 +261,12 @@ const app = {
         if (this._datos[n]) return this._datos[n];
         const lista = (window.PALABRAS[n] || []).map(w => Object.assign(Silabeo.analizar(w), { nivel: n }));
         const porClase = { aguda: [], llana: [], esdrujula: [] };
-        lista.forEach(a => { if (porClase[a.clase]) porClase[a.clase].push(a); });
-        return (this._datos[n] = { lista, porClase });
+        const porTilde = { con: [], sin: [] };
+        lista.forEach(a => {
+            if (porClase[a.clase]) porClase[a.clase].push(a);
+            if (a.tilde) porTilde.con.push(a); else porTilde.sin.push(a);
+        });
+        return (this._datos[n] = { lista, porClase, porTilde });
     },
 
     elegirPalabra(actividad) {
@@ -269,7 +280,11 @@ const app = {
         }
         let pool;
         if (actividad === 'silabas') pool = d.lista;
-        else {
+        else if (actividad === 'tilde') {
+            const pt = d.porTilde || { con: d.lista.filter(x => x.tilde), sin: d.lista.filter(x => !x.tilde) };
+            const quiereTilde = Math.random() < 0.5;
+            pool = (quiereTilde && pt.con.length) ? pt.con : (pt.sin.length ? pt.sin : d.lista);
+        } else {
             // reparto equilibrado: llana 40 %, aguda 35 %, esdrújula 25 %
             const r = Math.random();
             const clase = r < 0.4 ? 'llana' : r < 0.75 ? 'aguda' : 'esdrujula';
@@ -424,11 +439,12 @@ const app = {
     pintarPregunta() {
         const q = this.state.q, A = q.A, area = this.$('question-area'), texto = this.$('question-text');
         area.classList.remove('bloqueado');
+        const sinTilde = this.state.actividad === 'combinada' || this.state.actividad === 'tilde' || q.tipo === 'tilde';
 
         // indicador de pasos (solo en «Todo junto»)
         const ind = this.$('step-indicator');
         if (q.pasos) {
-            const nombres = { silabas: '✂️ Sílabas', tonica: '🔊 Tónica', clasificar: '🏷️ Clase' };
+            const nombres = { silabas: '✂️ Sílabas', tonica: '🔊 Tónica', clasificar: '🏷️ Clase', tilde: '✍️ Tilde' };
             ind.innerHTML = q.pasos.map((p, i) =>
                 '<span class="step-dot ' + (i < q.paso ? 'done' : i === q.paso ? 'now' : '') + '"></span>').join('') +
                 '<span>' + nombres[q.tipo] + ' · paso ' + (q.paso + 1) + ' de ' + q.pasos.length + '</span>';
@@ -437,8 +453,8 @@ const app = {
         if (q.tipo === 'clasificar') {
             texto.innerHTML = '¿Cómo es la palabra según su <b>sílaba tónica</b>?';
             const cabecera = q.pasos
-                ? this.fichasHTML(A, true, false)                       // ya se sabe dónde está la tónica
-                : '<div class="palabra-grande">' + esc(A.palabra) + '</div>';
+                ? this.fichasHTML(A, true, false, sinTilde)                       // ya se sabe dónde está la tónica
+                : '<div class="palabra-grande">' + esc(sinTilde ? Silabeo.quitarTildes(A.palabra) : A.palabra) + '</div>';
             area.innerHTML = cabecera + '<div class="options-grid">' + [
                 ['esdrujula', 'Esdrújula', 'tónica en la antepenúltima'],
                 ['llana', 'Llana', 'tónica en la penúltima'],
@@ -447,11 +463,21 @@ const app = {
             area.querySelectorAll('.option-btn').forEach(b => b.addEventListener('click', () => this.responder(b.dataset.clase, b)));
         } else if (q.tipo === 'tonica') {
             texto.innerHTML = 'Toca la <b>sílaba tónica</b>: la que suena más fuerte';
-            area.innerHTML = this.fichasHTML(A, false, true);
+            area.innerHTML = this.fichasHTML(A, false, true, sinTilde);
             area.querySelectorAll('button.sil-chip').forEach(b => b.addEventListener('click', () => this.responder(parseInt(b.dataset.i, 10), b)));
+        } else if (q.tipo === 'tilde') {
+            texto.innerHTML = '¿Lleva <b>tilde</b>? Toca la sílaba con tilde o pulsa «No lleva tilde»';
+            area.innerHTML = '<div class="palabra-grande" id="palabra-tilde-display">' + esc(Silabeo.quitarTildes(A.palabra)) + '</div>' +
+                this.fichasTildeHTML(A) +
+                '<div class="acciones-tilde">' +
+                '<button type="button" class="btn-no-tilde" data-val="no">🚫 No lleva tilde</button>' +
+                '</div>';
+            area.querySelectorAll('button.sil-chip').forEach(b => b.addEventListener('click', () => this.responder(parseInt(b.dataset.i, 10), b)));
+            const btnNo = area.querySelector('.btn-no-tilde');
+            if (btnNo) btnNo.addEventListener('click', () => this.responder('no', btnNo));
         } else {
             texto.innerHTML = 'Pulsa los botones de debajo para <b>cortar</b> la palabra en sílabas';
-            area.innerHTML = this.cortadorHTML(A) +
+            area.innerHTML = this.cortadorHTML(A, sinTilde) +
                 '<div class="cortador-ayuda">Cada sílaba es un golpe de voz.</div>' +
                 '<div class="acciones-cortador"><button type="button" class="btn-secondary" id="btn-borrar">Borrar cortes</button>' +
                 '<button type="button" class="btn-primary" id="btn-comprobar">Comprobar ✔</button></div>';
@@ -469,17 +495,25 @@ const app = {
         }
     },
 
-    fichasHTML(A, marcarTonica, botones) {
+    fichasHTML(A, marcarTonica, botones, sinTilde) {
+        return '<div class="sil-fila">' + A.silabas.map((s, i) => {
+            const txt = sinTilde ? Silabeo.quitarTildes(s) : s;
+            return (i ? '<span class="sil-guion">-</span>' : '') +
+            (botones
+                ? '<button type="button" class="sil-chip" data-i="' + i + '">' + esc(txt) + '</button>'
+                : '<span class="sil-chip fija' + (marcarTonica && i === A.tonica ? ' tonica' : '') + '">' + esc(txt) + '</span>');
+        }).join('') + '</div>';
+    },
+
+    fichasTildeHTML(A) {
         return '<div class="sil-fila">' + A.silabas.map((s, i) =>
             (i ? '<span class="sil-guion">-</span>' : '') +
-            (botones
-                ? '<button type="button" class="sil-chip" data-i="' + i + '">' + esc(s) + '</button>'
-                : '<span class="sil-chip fija' + (marcarTonica && i === A.tonica ? ' tonica' : '') + '">' + esc(s) + '</span>')
+            '<button type="button" class="sil-chip" data-i="' + i + '">' + esc(Silabeo.quitarTildes(s)) + '</button>'
         ).join('') + '</div>';
     },
 
-    cortadorHTML(A) {
-        const w = A.palabra, TIJERA = '<svg class="tijera" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="19" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8 16.4 17 3.5M16 16.4 7 3.5"/></svg>';
+    cortadorHTML(A, sinTilde) {
+        const w = sinTilde ? Silabeo.quitarTildes(A.palabra) : A.palabra, TIJERA = '<svg class="tijera" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="19" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8 16.4 17 3.5M16 16.4 7 3.5"/></svg>';
         let html = '';
         for (let i = 0; i < w.length; i++) {
             html += '<span class="letra">' + esc(w[i]) + '</span>';
@@ -559,12 +593,18 @@ const app = {
         if (!this.state.isPlaying || !q || q.resuelta || e.ctrlKey || e.metaKey || e.altKey) return;
         if (!this.$('screen-game').classList.contains('active')) return;
         if (q.tipo === 'silabas' && e.key === 'Enter') { e.preventDefault(); this.responder([...q.cortes].sort((a, b) => a - b)); return; }
+        if (q.tipo === 'tilde' && (e.key === '0' || e.key.toLowerCase() === 'n' || e.key === ' ')) {
+            e.preventDefault();
+            const btnNo = this.$('question-area').querySelector('.btn-no-tilde');
+            if (btnNo) this.responder('no', btnNo);
+            return;
+        }
         const n = parseInt(e.key, 10);
         if (!n) return;
         if (q.tipo === 'clasificar') {
             const b = this.$('question-area').querySelectorAll('.option-btn')[n - 1];
             if (b) this.responder(b.dataset.clase, b);
-        } else if (q.tipo === 'tonica') {
+        } else if (q.tipo === 'tonica' || q.tipo === 'tilde') {
             const b = this.$('question-area').querySelectorAll('button.sil-chip')[n - 1];
             if (b) this.responder(parseInt(b.dataset.i, 10), b);
         }
@@ -575,6 +615,7 @@ const app = {
         const A = q.A;
         if (q.tipo === 'clasificar') return valor === A.clase;
         if (q.tipo === 'tonica') return valor === A.tonica;
+        if (q.tipo === 'tilde') return A.tilde ? valor === A.tildeEn : valor === 'no';
         return valor.length === A.cortes.length && valor.every((c, i) => c === A.cortes[i]);
     },
 
@@ -583,7 +624,12 @@ const app = {
         const sils = A.silabas.map((s, i) => i === A.tonica ? '<b>' + esc(s.toUpperCase()) + '</b>' : esc(s)).join('-');
         if (q.tipo === 'silabas') return (ok ? '¡Bien! ' : 'Era: ') + '<b>' + esc(A.silabas.join('-')) + '</b>';
         if (q.tipo === 'tonica') return (ok ? '¡Bien! ' : 'La tónica es ') + sils;
-        return (ok ? '¡Bien! ' : 'Es ') + '<b>' + this.CLASES[A.clase] + '</b> · ' + sils;
+        if (q.tipo === 'clasificar') return (ok ? '¡Bien! ' : 'Es ') + '<b>' + this.CLASES[A.clase] + '</b> · ' + sils;
+        if (q.tipo === 'tilde') {
+            const exp = Silabeo.explicarTilde(A);
+            if (A.tilde) return (ok ? '¡Bien! ' : 'Era: ') + '<b>' + esc(A.palabra) + '</b> sí lleva tilde (' + exp.detalle + ')';
+            return (ok ? '¡Bien! ' : 'Era: ') + '<b>' + esc(A.palabra) + '</b> no lleva tilde (' + exp.detalle + ')';
+        }
     },
 
     marcarCorrecto(q, valor, boton) {
@@ -596,6 +642,24 @@ const app = {
         } else if (q.tipo === 'tonica') {
             area.querySelectorAll('button.sil-chip').forEach(b => { if (parseInt(b.dataset.i, 10) === q.A.tonica) b.classList.add('correct'); });
             if (!ok && boton) boton.classList.add('wrong');
+        } else if (q.tipo === 'tilde') {
+            const btnNo = area.querySelector('.btn-no-tilde');
+            const palDisp = area.querySelector('#palabra-tilde-display');
+            if (q.A.tilde) {
+                if (palDisp) palDisp.textContent = q.A.palabra;
+                area.querySelectorAll('button.sil-chip').forEach(b => {
+                    const idx = parseInt(b.dataset.i, 10);
+                    if (idx === q.A.tildeEn) {
+                        b.classList.add('correct');
+                        b.textContent = q.A.silabas[idx];
+                    }
+                });
+                if (valor === 'no' && btnNo) btnNo.classList.add('wrong');
+                else if (!ok && boton) boton.classList.add('wrong');
+            } else {
+                if (btnNo) btnNo.classList.add('correct');
+                if (valor !== 'no' && boton) boton.classList.add('wrong');
+            }
         } else {
             const c = this.$('cortador');
             c.classList.add('bloqueado');
@@ -664,9 +728,8 @@ const app = {
             s.pausado = false;
             if (!s.isPlaying) return;
             if (terminada) { this.endGame(); return; }
-            // nunca se vuelve a preguntar algo que la explicación acaba de contar: la de la tónica dice también la clase
-            // de la palabra, así que en «Todo junto» se salta el paso de clasificar y se pasa a la palabra siguiente
-            if (q.pasos && q.tipo === 'tonica') q.paso = q.pasos.length - 1;
+            // nunca se vuelve a preguntar algo que la explicación acaba de contar: en «Todo junto» se pasa a la palabra siguiente
+            if (q.pasos && (q.tipo === 'tonica' || q.tipo === 'clasificar' || q.tipo === 'tilde')) q.paso = q.pasos.length - 1;
             this.siguientePregunta();
         } else if (s.mode === 'practice') {      // práctica sin explicaciones
             this.later(() => this.siguientePregunta(), 1600);

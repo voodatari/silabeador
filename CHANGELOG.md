@@ -4,6 +4,12 @@ Historial completo desde que empezó el proyecto (8 de octubre de 2026), no solo
 
 Formato de versión: `AAAA.MM.DD-letra`, igual que el número que llevan los archivos en `index.html`; desde la 2.0, número de versión (2.0, 2.0.1, 2.1…). Las fechas son las reales: algunas versiones de la primera tarde llevan «2026.10.09» en el nombre pero se hicieron el 8.
 
+## [2.2] - 2026-10-14
+- **Nueva actividad: «¿Lleva tilde?»**. Permite practicar las reglas de acentuación indicando si una palabra debe llevar o no tilde (tocando la sílaba correspondiente o pulsando «No lleva tilde»). Selección equilibrada (50 % palabras con tilde, 50 % sin tilde).
+- **«Todo junto» ampliado a 4 pasos**: División en sílabas ➜ Sílaba tónica ➜ Clasificación (aguda/llana/esdrújula) ➜ Comprobación de tilde.
+- **Explicación completa de errores**: Tanto la explicación escrita como la infografía animada y narrada con voz (Piper) explican las reglas de acentuación (agudas, llanas, esdrújulas e hiatos acentuales con vocal débil tónica).
+- Atajos de teclado (teclas 1..N para señalar sílaba, 0/N/Espacio para «No lleva tilde») y soporte completo en el ranking local.
+
 ## [2.1.7] - 2026-10-11
 - Voz: nunca más «acentuada». La sílaba «ís» de «he-ro-ís-mo» se leía «i acentuada ese» (y «ás», «és», «ús» igual, y las mayúsculas): espeak lee como el nombre de la letra una vocal con tilde sola y esas sílabas. Se comprobó con el propio espeak (821 sílabas con tilde; solo fallaban esas) y ahora se mandan sin tilde (la tónica ya la marca el juego con su acento, tono y duración).
 

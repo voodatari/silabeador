@@ -97,6 +97,37 @@ window.Explicacion = (function () {
             '</ol>';
     }
 
+    /* ---------- TILDE ---------- */
+    function porQueTilde(A, E) {
+        var exp = Silabeo.explicarTilde(A);
+        if (A.tilde) {
+            if (E === 'no') {
+                return 'Has respondido que ' + malo('no lleva tilde') + ', pero ' + sil(A.palabra) + ' <b>sí debe llevar tilde</b> en la sílaba ' + sil(A.silabas[A.tildeEn]) + '. ' +
+                    'Motivo: ' + exp.detalle + '.';
+            }
+            var silElegida = Silabeo.quitarTildes(A.silabas[E] || '');
+            return 'Has marcado la sílaba ' + malo('«' + silElegida + '»') + ', pero la tilde debe ir en la sílaba ' + sil(A.silabas[A.tildeEn]) + '. ' +
+                'Motivo: ' + exp.detalle + '.';
+        }
+        var elegidaTxt = E === 'no' ? 'no lleva tilde' : '«' + Silabeo.quitarTildes(A.silabas[E] || '') + '»';
+        return 'Has marcado ' + malo(elegidaTxt) + ', pero ' + sil(A.palabra) + ' <b>no lleva tilde</b>. ' +
+            'Motivo: ' + exp.detalle + '.';
+    }
+
+    function pasosTilde(A) {
+        var exp = Silabeo.explicarTilde(A);
+        return '<ol class="ex-pasos">' +
+            '<li>Divide en <b>sílabas</b> y busca la <b>tónica</b>: ' + fichas(A, true) + ' (la tónica es ' + sil(A.silabas[A.tonica]) + ', la ' + ORDINAL[A.pos] + ').</li>' +
+            '<li>Clasifícala según su posición: es <b>' + NOMBRE[A.clase] + '</b> y termina en <b>' + (A.terminacion === 'vocal' ? 'vocal' : A.palabra[A.palabra.length - 1]) + '</b>.</li>' +
+            '<li>Aplica la <b>regla de acentuación</b>:' +
+                '<div class="ex-conclusion">' + exp.detalle.charAt(0).toUpperCase() + exp.detalle.slice(1) + '.<br>' +
+                (A.tilde
+                    ? 'Debe escribirse con tilde: <b class="ex-bien">' + esc(A.palabra) + '</b>.'
+                    : 'Se escribe sin tilde: <b class="ex-bien">' + esc(A.palabra) + '</b>.') +
+                '</div></li>' +
+            '</ol>';
+    }
+
     /* ---------- SILABEAR ---------- */
     var REGLA = {
         hiato: 'Hiato: dos vocales seguidas que se pronuncian en <b>dos golpes de voz</b>. Ocurre con dos vocales abiertas (a, e, o) o cuando la <b>í</b> o la <b>ú</b> llevan tilde junto a otra vocal.',
@@ -265,6 +296,12 @@ window.Explicacion = (function () {
             mal = A.silabas[d.elegida]; bien = A.silabas[A.tonica];
             porQue = '<p>' + porQueTonica(A, d.elegida) + '</p>';
             como = pasosTonica(A);
+        } else if (d.tipo === 'tilde') {
+            enunciado = '¿Debe llevar tilde la palabra ' + b(Silabeo.quitarTildes(A.palabra)) + '?';
+            mal = d.elegida === 'no' ? 'No lleva tilde' : 'Tilde en «' + Silabeo.quitarTildes(A.silabas[d.elegida] || '') + '»';
+            bien = A.tilde ? 'Tilde en «' + A.silabas[A.tildeEn] + '» (' + A.palabra + ')' : 'No lleva tilde (' + A.palabra + ')';
+            porQue = '<p>' + porQueTilde(A, d.elegida) + '</p>';
+            como = pasosTilde(A);
         } else {
             enunciado = 'Divide ' + b(A.palabra) + ' en sílabas (golpes de voz)';
             mal = partirPor(A.palabra, d.elegida).join('-'); bien = A.silabas.join('-');
@@ -331,7 +368,7 @@ window.Explicacion = (function () {
     /* piezas de texto que reutiliza la infografía animada con voz (infografia.js) */
     var interno = {
         NOMBRE: NOMBRE, ORDINAL: ORDINAL, DEFINICION: DEFINICION, REGLA: REGLA, ORDEN_REGLAS: ORDEN_REGLAS,
-        reglaTonica: reglaTonica, porQueClase: porQueClase, porQueTonica: porQueTonica,
+        reglaTonica: reglaTonica, porQueClase: porQueClase, porQueTonica: porQueTonica, porQueTilde: porQueTilde, pasosTilde: pasosTilde,
         grupos: grupos, mensajeGrupo: mensajeGrupo, silabaDesde: silabaDesde, silabaDe: silabaDe, consonanteDesde: consonanteDesde, vozDigrafo: vozDigrafo, partirPor: partirPor, parDe: parDe
     };
 

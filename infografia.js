@@ -200,9 +200,53 @@ window.Infografia = (function () {
         return b;
     }
 
+    function guionTilde(d, A) {
+        var exp = Silabeo.explicarTilde(A);
+        var mal = d.elegida === 'no' ? 'No lleva tilde' : ('Tilde en «' + Silabeo.quitarTildes(A.silabas[d.elegida] || '') + '»');
+        var bien = A.tilde ? ('Tilde en «' + A.silabas[A.tildeEn] + '»') : 'No lleva tilde';
+        var n = A.silabas.length, tonicaTxt = A.silabas[A.tonica];
+        var palabraSin = Silabeo.quitarTildes(A.palabra);
+
+        var b = [];
+        b.push({
+            cap: '¿Lleva tilde la palabra <b>' + palabraSin + '</b>?',
+            voz: 'Vamos a ver si la palabra ' + A.palabra + ' lleva tilde o no.',
+            anim: function (e) { e.mostrarPalabra(); }
+        });
+        b.push({
+            cap: 'Has elegido <b class="ig-mal">' + mal + '</b>, pero la respuesta correcta es <b class="ig-bien">' + bien + '</b>.',
+            voz: 'Has elegido ' + (d.elegida === 'no' ? 'que no lleva tilde' : 'tilde en ' + Silabeo.quitarTildes(A.silabas[d.elegida] || '')) + ', pero la respuesta correcta es ' + (A.tilde ? 'tilde en ' + A.silabas[A.tildeEn] : 'que no lleva tilde') + '. Vamos a comprobarlo paso a paso.',
+            anim: function (e) { e.pildoras(mal, bien); }
+        });
+        b.push({
+            cap: '1 · Dividimos la palabra en <b>sílabas</b>',
+            voz: [{ t: 'Primero dividimos la palabra en sílabas.', pausa: 900 + n * 150 }],
+            anim: function (e) { A.silabas.forEach(function (s, k) { e.tarde(500 + k * 450, function () { e.revelarSilaba(k); }); }); }
+        });
+        b.push({
+            cap: '2 · Buscamos la sílaba <b>tónica</b>: la que suena más fuerte',
+            voz: ['Ahora buscamos la sílaba tónica. Vamos a decir la palabra alargando cada sílaba.', silabeo(A.silabas, A.tonica), 'La sílaba tónica es ' + tonicaTxt + '.'],
+            anim: function (e) { e.sueno(-1); },
+            sil: function (e, k) { e.sueno(k); },
+            seg: function (e, i) { if (i === 2) e.tonicaFinal(); }
+        });
+        b.push({
+            cap: '3 · Es una palabra <b>' + (I.NOMBRE[A.clase] || A.clase) + '</b> y termina en <b>' + (A.terminacion === 'vocal' ? 'vocal' : A.palabra[A.palabra.length - 1]) + '</b>',
+            voz: 'La tónica es la ' + (I.ORDINAL[A.pos] || 'última') + ', así que es una palabra ' + (I.NOMBRE[A.clase] || A.clase) + '.',
+            anim: function (e) { e.insigniaClase(); }
+        });
+        b.push({
+            cap: '4 · Regla: ' + exp.detalle + '<br>➜ <b class="ig-bien">' + A.palabra + '</b>' + (A.tilde ? ' (con tilde)' : ' (sin tilde)'),
+            voz: exp.voz + (A.tilde ? ' Por eso se escribe con tilde: ' + A.palabra + '.' : ' Por eso se escribe sin tilde: ' + A.palabra + '.'),
+            anim: function (e) { if (A.tilde) e.marcarRegla(); },
+            final: true
+        });
+        return b;
+    }
+
     function guion(d) {
         var A = Silabeo.analizar(d.palabra);
-        return { A: A, beats: d.tipo === 'silabas' ? guionSilabas(d, A) : guionAcento(d, A) };
+        return { A: A, beats: d.tipo === 'silabas' ? guionSilabas(d, A) : d.tipo === 'tilde' ? guionTilde(d, A) : guionAcento(d, A) };
     }
 
     var preparados = {};
