@@ -94,7 +94,7 @@ window.Explicacion = (function () {
         var todoJunto = (hecho || []).length > 0;      // «Todo junto»: solo la tónica, sin decir la clase
         return '<ol class="ex-pasos">' +
             '<li>Di la palabra en voz alta, alargando cada sílaba. ' + TRUCO + '</li>' +
-            '<li>¿Lleva tilde? ' + (A.tilde ? reglaTonica(A) : 'No. La tónica es la sílaba que suena más fuerte: ' + sil(A.silabas[A.tonica]) + '.') + '</li>' +
+            (todoJunto ? '' : '<li>¿Lleva tilde? ' + (A.tilde ? reglaTonica(A) : 'No. La tónica es la sílaba que suena más fuerte: ' + sil(A.silabas[A.tonica]) + '.') + '</li>') +
             '<li>Así queda, con la tónica marcada:' + (todoJunto ? '<div class="ex-pos-sola">' + fichas(A, true) + '</div>' : posiciones(A)) +
                 (todoJunto ? '' : '<div class="ex-conclusion">Es <b class="ex-bien">' + NOMBRE[A.clase] + '</b> (la tónica es la ' + ORDINAL[A.pos] + ').</div>') + '</li>' +
             '</ol>';
@@ -289,6 +289,12 @@ window.Explicacion = (function () {
     /* ---------- ventana ---------- */
     function construir(d) {
         var A = Silabeo.analizar(d.palabra), enunciado, mal, bien, porQue, como;
+        /* «Todo junto»: mientras se explica un paso que no es el de la tilde, la palabra se ve SIN tildes (con ellas se daría la respuesta
+           de la última fase) */
+        if (d.todoJunto && d.tipo !== 'tilde') {
+            var qt = Silabeo.quitarTildes;
+            A = Object.assign({}, A, { palabra: qt(A.palabra), silabas: A.silabas.map(qt), tilde: false, tildeEn: -1 });
+        }
         if (d.tipo === 'clasificar') {
             enunciado = 'Clasifica ' + b(A.palabra) + ' según su sílaba tónica';
             mal = NOMBRE[d.elegida]; bien = NOMBRE[A.clase];

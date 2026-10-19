@@ -762,7 +762,7 @@ const app = {
             const terminada = s.mode === 'sudden_death' || (s.mode === 'survival' && s.lives <= 0);
             if (terminada) Sonido.musica('fin');
             // en «Todo junto» se explica solo el paso fallado: los anteriores ya los hizo bien el jugador
-            const datos = { tipo: q.tipo, palabra: q.A.palabra, elegida: valor, hecho: q.pasos ? q.pasos.slice(0, q.paso) : [] };
+            const datos = { tipo: q.tipo, palabra: q.A.palabra, elegida: valor, hecho: q.pasos ? q.pasos.slice(0, q.paso) : [], todoJunto: !!q.pasos };
             const animada = VozUI.explicacion();
             if (animada) Infografia.preparar(datos);      // empieza a sintetizar la narración mientras se ve la respuesta correcta
             await new Promise(r => this.later(r, 900));

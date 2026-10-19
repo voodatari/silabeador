@@ -4,6 +4,10 @@ Historial completo desde que empezó el proyecto (8 de octubre de 2026), no solo
 
 Formato de versión: `AAAA.MM.DD-letra`, igual que el número que llevan los archivos en `index.html`; desde la 2.0, número de versión (2.0, 2.0.1, 2.1…). Las fechas son las reales: algunas versiones de la primera tarde llevan «2026.10.09» en el nombre pero se hicieron el 8.
 
+## [2.3.6] - 2026-10-19
+- **«Todo junto»: las explicaciones ya no dan pistas de la tilde.** Al explicar un fallo en las sílabas, la tónica o la clase, la palabra y sus sílabas se ven **sin tildes** (en la explicación animada y en la escrita), y se salta la frase «lleva tilde en la …» de la tónica. La voz sigue pronunciando bien la palabra. Con la tilde a la vista solo se explica la fase de la tilde y las actividades sueltas.
+- La voz ya no dice «Vamos a verlo / comprobarlo paso a paso» cuando solo hay un paso que explicar (los fallos de «Todo junto» tras acertar las fases anteriores).
+
 ## [2.3.5] - 2026-10-19
 - **«Todo junto»: transiciones suaves entre fases.** Las fichas con las sílabas de la palabra, que se repiten en tónica, clase y tilde, ya no saltan de sitio al cambiar de fase: se deslizan a su posición nueva con aceleración y frenada, en 0,24 s. Lo que desaparece (textos, botones, palabra, nota de respuesta) se desvanece en 0,11 s y lo que entra aparece con un fundido de 0,18 s, tanto entre fases como entre una palabra y la siguiente.
 

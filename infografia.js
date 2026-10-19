@@ -90,7 +90,7 @@ window.Infografia = (function () {
         cv: 'va con su vocal', cierra: 'cierra la sílaba', 'hiato': 'hiato', 'hiato-tilde': 'hiato', cc: 'se reparten', 'v-cv': 'se junta con la vocal de detrás'
     };
 
-    function guionAcento(d, A) {
+    function guionAcento(d, A, AV) {
         var clasif = d.tipo === 'clasificar', n = A.silabas.length, tonicaTxt = A.silabas[A.tonica];
         var mal = clasif ? I.NOMBRE[d.elegida] : A.silabas[d.elegida], bien = clasif ? I.NOMBRE[A.clase] : tonicaTxt;
         var nota = (clasif && d.elegida === 'esdrujula' && n < 3) ? ' Fíjate: solo tiene ' + n + ' sílabas, así que no puede tener antepenúltima.' : '';
@@ -99,18 +99,20 @@ window.Infografia = (function () {
         /* «Todo junto»: lo que el jugador ya ha hecho bien antes NO se explica, solo el paso en el que ha fallado (la palabra sale ya
            dividida y, en su caso, con la tónica marcada) */
         var hecho = d.hecho || [], sinSil = hecho.indexOf('silabas') >= 0, sinTon = hecho.indexOf('tonica') >= 0;
+        var malV = clasif ? mal : AV.silabas[d.elegida], bienV = clasif ? bien : AV.silabas[A.tonica];      // lo que se ve (sin tildes en «Todo junto»)
+        var pasoAPaso = hecho.length ? '' : ' Vamos a verlo paso a paso.';      // si solo hay un paso que explicar, no se anuncian «pasos»
 
         var b = [];
         b.push({
-            cap: titulo + ' <b>' + A.palabra + '</b>',
+            cap: titulo + ' <b>' + AV.palabra + '</b>',
             voz: clasif ? 'Vamos a clasificar la palabra ' + A.palabra + '.' : 'Vamos a buscar la sílaba tónica de la palabra ' + A.palabra + '.',
             anim: function (e) { e.mostrarPalabra(); if (sinSil) e.yaHecho(sinTon, false); }
         });
         b.push({
-            cap: 'Has elegido <b class="ig-mal">' + mal + '</b>, pero la correcta es <b class="ig-bien">' + bien + '</b>.' + (nota ? '<br><small>' + nota.trim() + '</small>' : ''),
+            cap: 'Has elegido <b class="ig-mal">' + malV + '</b>, pero la correcta es <b class="ig-bien">' + bienV + '</b>.' + (nota ? '<br><small>' + nota.trim() + '</small>' : ''),
             // UNA sola oración, con comas: así Piper la entona entera (partirla en llamadas sueltas rompía la entonación)
-            voz: 'Has elegido ' + mal + ', pero la respuesta correcta es ' + bien + '.' + nota + ' Vamos a verlo paso a paso.',
-            anim: function (e) { e.pildoras(mal, bien); },
+            voz: 'Has elegido ' + mal + ', pero la respuesta correcta es ' + bien + '.' + nota + pasoAPaso,
+            anim: function (e) { e.pildoras(malV, bienV); },
             // la sílaba elegida se pone en color en el momento aproximado en que se nombra dentro de la frase
             seg: function (e, i, fi, dur) {
                 if (fi !== 0 || clasif) return;
@@ -133,7 +135,7 @@ window.Infografia = (function () {
             seg: function (e, i) { if (i === 2) e.tonicaFinal(); }
         });
         // solo se explica la tilde (marca la tónica); nunca las terminaciones (n, s, vocal…), ni al buscar la tónica ni al clasificar
-        if (!clasif && !sinTon && A.tilde) b.push({
+        if (!clasif && !sinTon && A.tilde && !d.todoJunto) b.push({
             cap: I.reglaTonica(A),
             voz: vozRegla(A),
             anim: function (e) { e.marcarRegla(); }
@@ -156,9 +158,9 @@ window.Infografia = (function () {
         return b;
     }
 
-    function guionSilabas(d, A) {
+    function guionSilabas(d, A, AV) {
         var elegida = d.elegida, sils = A.silabas, n = sils.length;
-        var tuDiv = elegida.length ? I.partirPor(A.palabra, elegida) : [A.palabra];
+        var tuDiv = elegida.length ? I.partirPor(AV.palabra, elegida) : [AV.palabra], silsV = AV.silabas;      // lo que se ve (sin tildes en «Todo junto»)
         var sobran = elegida.filter(function (c) { return A.cortes.indexOf(c) < 0; });
         var faltan = A.cortes.filter(function (c) { return elegida.indexOf(c) < 0; });
         var grupos = I.grupos(A, sobran, true).map(function (g) { return { sobra: true, g: g }; })
@@ -166,7 +168,7 @@ window.Infografia = (function () {
 
         var b = [];
         b.push({
-            cap: 'Dividir en sílabas <b>' + A.palabra + '</b>',
+            cap: 'Dividir en sílabas <b>' + AV.palabra + '</b>',
             voz: 'Vamos a dividir la palabra ' + A.palabra + ' en sílabas.',
             anim: function (e) { e.mostrarPalabra(); }
         });
@@ -176,7 +178,7 @@ window.Infografia = (function () {
             anim: function (e) { e.cortesAlumno(elegida); }
         });
         b.push({
-            cap: 'Pero se divide así: <b class="ig-bien">' + sils.join('-') + '</b>',
+            cap: 'Pero se divide así: <b class="ig-bien">' + silsV.join('-') + '</b>',
             voz: ['Pero se divide así:', silabeo(sils, A.tonica)],
             anim: function (e) { e.limpiarCortes(); },
             sil: function (e, k) { e.revelarSilaba(k); }
@@ -187,7 +189,7 @@ window.Infografia = (function () {
             anim: function (e) { e.contarNucleos(); }
         });
         grupos.forEach(function (x) {
-            var texto = I.mensajeGrupo(A, x.g.motivo, x.g.pos, x.sobra);
+            var texto = I.mensajeGrupo(AV, x.g.motivo, x.g.pos, x.sobra);
             b.push({
                 cap: texto,
                 voz: mensajeVoz(A, x.g.motivo, x.g.pos, x.sobra),
@@ -195,7 +197,7 @@ window.Infografia = (function () {
             });
         });
         b.push({
-            cap: 'Así queda: <b class="ig-bien">' + sils.join('-') + '</b>',
+            cap: 'Así queda: <b class="ig-bien">' + silsV.join('-') + '</b>',
             voz: ['Así queda:', silabeo(sils, A.tonica)],
             anim: function (e) { e.cortesCorrectos(); },
             sil: function (e, k) { e.destacarSilaba(k); },
@@ -221,7 +223,7 @@ window.Infografia = (function () {
         });
         b.push({
             cap: 'Has elegido <b class="ig-mal">' + mal + '</b>, pero la respuesta correcta es <b class="ig-bien">' + bien + '</b>.',
-            voz: 'Has elegido ' + (d.elegida === 'no' ? 'que no lleva tilde' : 'tilde en ' + Silabeo.quitarTildes(A.silabas[d.elegida] || '')) + ', pero la respuesta correcta es ' + (A.tilde ? 'tilde en ' + A.silabas[A.tildeEn] : 'que no lleva tilde') + '. Vamos a comprobarlo paso a paso.',
+            voz: 'Has elegido ' + (d.elegida === 'no' ? 'que no lleva tilde' : 'tilde en ' + Silabeo.quitarTildes(A.silabas[d.elegida] || '')) + ', pero la respuesta correcta es ' + (A.tilde ? 'tilde en ' + A.silabas[A.tildeEn] : 'que no lleva tilde') + '.' + (hecho.length ? '' : ' Vamos a comprobarlo paso a paso.'),
             anim: function (e) { e.pildoras(mal, bien); }
         });
         if (!sinSil) b.push({
@@ -250,13 +252,21 @@ window.Infografia = (function () {
         return b;
     }
 
+    /* «Todo junto»: mientras se explica un paso que NO es el de la tilde, la palabra se ve SIN tildes (con ellas se daría la respuesta de la
+       última fase). La voz sí dice la palabra bien (lleva la tilde en el texto que se sintetiza); lo que se ve usa esta copia. */
+    function sinTildes(A) {
+        var q = Silabeo.quitarTildes;
+        return Object.assign({}, A, { palabra: q(A.palabra), silabas: A.silabas.map(q), tilde: false, tildeEn: -1 });
+    }
+
     function guion(d) {
         var A = Silabeo.analizar(d.palabra);
-        return { A: A, beats: d.tipo === 'silabas' ? guionSilabas(d, A) : d.tipo === 'tilde' ? guionTilde(d, A) : guionAcento(d, A) };
+        var AV = d.todoJunto && d.tipo !== 'tilde' ? sinTildes(A) : A;
+        return { A: A, AV: AV, beats: d.tipo === 'silabas' ? guionSilabas(d, A, AV) : d.tipo === 'tilde' ? guionTilde(d, A) : guionAcento(d, A, AV) };
     }
 
     var preparados = {};
-    function clave(d) { return d.tipo + '|' + d.palabra + '|' + JSON.stringify(d.elegida) + '|' + (d.hecho || []).join(','); }
+    function clave(d) { return d.tipo + '|' + d.palabra + '|' + JSON.stringify(d.elegida) + '|' + (d.hecho || []).join(',') + '|' + (d.todoJunto ? 'tj' : ''); }
     function preparar(d) {
         var k = clave(d);
         if (!preparados[k]) {
@@ -496,7 +506,7 @@ window.Infografia = (function () {
             var previo = document.activeElement;
             var script;
             try { script = preparar(datos); } catch (e) { console.warn('Infografia', e); return Explicacion.mostrar(datos).then(resolve); }
-            var beats = script.beats, A = script.A, total = beats.length;
+            var beats = script.beats, A = script.AV, total = beats.length;
 
             var velo = el('div', 'dialog-overlay ig-overlay');
             velo.innerHTML =
