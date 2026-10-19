@@ -4,6 +4,16 @@ Historial completo desde que empezó el proyecto (8 de octubre de 2026), no solo
 
 Formato de versión: `AAAA.MM.DD-letra`, igual que el número que llevan los archivos en `index.html`; desde la 2.0, número de versión (2.0, 2.0.1, 2.1…). Las fechas son las reales: algunas versiones de la primera tarde llevan «2026.10.09» en el nombre pero se hicieron el 8.
 
+## [2.2.2] - 2026-10-19
+- **Acentuación según el Libro de estilo de la RAE** (rae.es/libro-estilo-lengua-española/acentuación), tanto para comprobar como para explicar:
+  - Agudas: llevan tilde si acaban en vocal o en -n / -s **precedidas de vocal**. Si la -n o la -s van detrás de otra consonante, cuentan como consonante: *robots*, *tictacs*, *zigzags* (agudas) no se tildan.
+  - Llanas: llevan tilde si acaban en consonante distinta de -n o -s, **en consonante precedida de otra consonante** o en -y: *récords*, *bíceps*, *cómics*, *wéstern*, *yóquey*. Antes se explicaba *récords* como «termina en s», que era justo lo contrario de la regla.
+  - Vocal cerrada (i, u) tónica junto a una abierta (a, e, o): siempre tilde, sea cual sea la terminación (*maíz*, *baúl*, *búho*, *prohíbe*; ahora también cuando hay una hache en medio por detrás). Explicación con las palabras de la RAE.
+  - Palabras con **dos grafías válidas** (*video/vídeo*, *fútbol/futbol*, *chófer/chofer*, *período/periodo*, *cardíaco/cardiaco*, *zodiaco/zodíaco*, *icono/ícono*, *tríada/triada*…): se da por buena cualquiera de las dos y la explicación lo dice.
+  - Monosílabas: explicación de la tilde diacrítica (*té/te*, *más/mas*…) y de las que se escriben como una sola sílaba aunque suenen en dos (*guion*, *rio*).
+  - Cuando termina en «ds», «ps», «cs», «rn»… la explicación (escrita y con voz) dice la terminación completa, no solo la última letra.
+- **Nada se mueve al aparecer el texto de respuesta**: el espacio del texto que sale debajo del todo al contestar se reserva desde el principio, con las líneas del texto más largo de cada actividad (medido con todas las palabras del juego). Antes, en «¿Lleva tilde?» en móvil, la palabra subía un poco al acertar.
+
 ## [2.2.1] - 2026-10-19
 - Explicación animada en móvil: las dos píldoras («Tu respuesta…» y «Correcta…») van ahora una encima de la otra, así que ya no se cortan por los lados con textos largos como «Tilde en «dián»» (y la escena no se encoge por culpa de ellas). El ajuste de tamaño mide con el texto real de «¿Lleva tilde?».
 - Los bloques de la explicación (píldoras, palabra, sílabas, resultado) se reparten el alto disponible, con más aire entre ellos, en vez de quedar apelotonados.

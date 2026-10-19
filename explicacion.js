@@ -118,7 +118,7 @@ window.Explicacion = (function () {
         var exp = Silabeo.explicarTilde(A);
         return '<ol class="ex-pasos">' +
             '<li>Divide en <b>sílabas</b> y busca la <b>tónica</b>: ' + fichas(A, true) + ' (la tónica es ' + sil(A.silabas[A.tonica]) + ', la ' + ORDINAL[A.pos] + ').</li>' +
-            '<li>Clasifícala según su posición: es <b>' + NOMBRE[A.clase] + '</b> y termina en <b>' + (A.terminacion === 'vocal' ? 'vocal' : A.palabra[A.palabra.length - 1]) + '</b>.</li>' +
+            '<li>Clasifícala según su posición: es <b>' + NOMBRE[A.clase] + '</b> y termina en <b>' + A.fin + '</b>.</li>' +
             '<li>Aplica la <b>regla de acentuación</b>:' +
                 '<div class="ex-conclusion">' + exp.detalle.charAt(0).toUpperCase() + exp.detalle.slice(1) + '.<br>' +
                 (A.tilde

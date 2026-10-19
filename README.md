@@ -38,6 +38,7 @@ El silabeo es **fonético**: divide por golpes de voz, no por la separación de 
 - Diptongos y triptongos no se separan; los hiatos sí (dos vocales abiertas, o í / ú con tilde junto a otra vocal).
 - La h entre vocales no impide el diptongo.
 - La sílaba tónica la marca la tilde; sin tilde, el motor la calcula por la terminación (eso no se explica al alumno: las explicaciones solo hablan de la tilde y de la sílaba que suena más fuerte).
+- **Tilde (actividad «¿Lleva tilde?» y su explicación)**, según el [Libro de estilo de la lengua española](https://www.rae.es/libro-estilo-lengua-espa%C3%B1ola/acentuaci%C3%B3n) de la RAE: agudas con tilde si acaban en vocal o en -n / -s precedidas de vocal (*mamá, atención, revés*); llanas con tilde si acaban en consonante distinta de -n o -s, en consonante precedida de otra consonante o en -y (*árbol, bíceps, récords, wéstern, yóquey*); esdrújulas siempre; vocal cerrada tónica junto a una abierta siempre (*maíz, baúl, búho*); monosílabas sin tilde salvo la diacrítica. Las palabras con dos grafías válidas (*video/vídeo, fútbol/futbol, período/periodo…*) se aceptan en cualquiera de las dos.
 
 Cada explicación se construye con la regla concreta que se aplica a esa palabra: la animada y narrada ([infografia.js](infografia.js)) o la escrita ([explicacion.js](explicacion.js)).
 

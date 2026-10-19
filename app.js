@@ -439,6 +439,7 @@ const app = {
     pintarPregunta() {
         const q = this.state.q, A = q.A, area = this.$('question-area'), texto = this.$('question-text');
         area.classList.remove('bloqueado');
+        this.$('answer-note').className = 'answer-note nota-' + q.tipo;      // reserva de sitio para el texto de respuesta (ver style.css)
         const sinTilde = this.state.actividad === 'combinada' || this.state.actividad === 'tilde' || q.tipo === 'tilde';
 
         // indicador de pasos (solo en «Todo junto»)
@@ -615,7 +616,11 @@ const app = {
         const A = q.A;
         if (q.tipo === 'clasificar') return valor === A.clase;
         if (q.tipo === 'tonica') return valor === A.tonica;
-        if (q.tipo === 'tilde') return A.tilde ? valor === A.tildeEn : valor === 'no';
+        if (q.tipo === 'tilde') {
+            if (valor === (A.tilde ? A.tildeEn : 'no')) return true;
+            // palabras con dos grafías válidas para la RAE (video/vídeo, fútbol/futbol…): vale la de cualquiera de las dos
+            return Silabeo.variantes(A.palabra).some(v => Silabeo.respuestaDeVariante(A, v) === valor);
+        }
         return valor.length === A.cortes.length && valor.every((c, i) => c === A.cortes[i]);
     },
 
@@ -627,6 +632,7 @@ const app = {
         if (q.tipo === 'clasificar') return (ok ? '¡Bien! ' : 'Es ') + '<b>' + this.CLASES[A.clase] + '</b> · ' + sils;
         if (q.tipo === 'tilde') {
             const exp = Silabeo.explicarTilde(A);
+            if (exp.tipo === 'variante') return (ok ? '¡Bien! ' : 'Era: ') + exp.detalle.charAt(0).toUpperCase() + exp.detalle.slice(1);
             if (A.tilde) return (ok ? '¡Bien! ' : 'Era: ') + '<b>' + esc(A.palabra) + '</b> sí lleva tilde (' + exp.detalle + ')';
             return (ok ? '¡Bien! ' : 'Era: ') + '<b>' + esc(A.palabra) + '</b> no lleva tilde (' + exp.detalle + ')';
         }
@@ -645,7 +651,10 @@ const app = {
         } else if (q.tipo === 'tilde') {
             const btnNo = area.querySelector('.btn-no-tilde');
             const palDisp = area.querySelector('#palabra-tilde-display');
-            if (q.A.tilde) {
+            if (ok && valor !== (q.A.tilde ? q.A.tildeEn : 'no')) {      // acierto con la otra grafía válida
+                if (valor === 'no') { if (btnNo) btnNo.classList.add('correct'); }
+                else if (boton) boton.classList.add('correct');
+            } else if (q.A.tilde) {
                 if (palDisp) palDisp.textContent = q.A.palabra;
                 area.querySelectorAll('button.sil-chip').forEach(b => {
                     const idx = parseInt(b.dataset.i, 10);

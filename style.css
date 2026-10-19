@@ -766,3 +766,19 @@ html.movil .ajuste .perf-switch { top: 0.5rem; right: 0.5rem; transform: none; w
 html.movil .ajuste .perf-switch::after { width: 0.85rem; height: 0.85rem; top: 0.175rem; left: 0.175rem; }
 html.movil .ajuste[aria-pressed="true"] .perf-switch::after { transform: translateX(0.9rem); }
 html.movil .aj-fondo .segmented button { font-size: 0.74rem; padding: 0.4rem 0.45rem; min-width: 0; }
+
+
+/* REGLA DE DISEÑO: lo que aparece de golpe no mueve nada. El texto de respuesta («¡Bien! … sí lleva tilde (…)») sale debajo del todo al
+   contestar; su sitio se reserva desde que aparece la pregunta, con las líneas que ocupa el texto más largo de cada actividad (medido con
+   todas las palabras del juego: ¿Lleva tilde? 2 líneas en escritorio y 3 en móvil; tónica y clasificar 2 en móvil), con la misma
+   altura de línea en todos los navegadores. Si no, el tablero repartía de nuevo su contenido y la palabra se movía. */
+.answer-note { --lineas: 1; line-height: 1.35; min-height: calc(var(--lineas) * 1.35em + 0.1em); }
+.answer-note.nota-tilde { --lineas: 2; }
+html.movil .answer-note { min-height: calc(var(--lineas) * 1.35em + 0.1em); }
+html.movil .answer-note.nota-tilde { --lineas: 3; }
+html.movil .answer-note.nota-tonica, html.movil .answer-note.nota-clasificar { --lineas: 2; }
+@media (max-width: 640px) {
+    .answer-note { min-height: calc(var(--lineas) * 1.35em + 0.1em); }
+    .answer-note.nota-tilde { --lineas: 3; }
+    .answer-note.nota-tonica, .answer-note.nota-clasificar { --lineas: 2; }
+}

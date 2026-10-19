@@ -231,7 +231,7 @@ window.Infografia = (function () {
             seg: function (e, i) { if (i === 2) e.tonicaFinal(); }
         });
         b.push({
-            cap: '3 · Es una palabra <b>' + (I.NOMBRE[A.clase] || A.clase) + '</b> y termina en <b>' + (A.terminacion === 'vocal' ? 'vocal' : A.palabra[A.palabra.length - 1]) + '</b>',
+            cap: '3 · Es una palabra <b>' + (I.NOMBRE[A.clase] || A.clase) + '</b> y termina en <b>' + A.fin + '</b>',
             voz: 'La tónica es la ' + (I.ORDINAL[A.pos] || 'última') + ', así que es una palabra ' + (I.NOMBRE[A.clase] || A.clase) + '.',
             anim: function (e) { e.insigniaClase(); }
         });

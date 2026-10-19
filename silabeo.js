@@ -216,11 +216,17 @@
         var tildadas = [];
         silabas.forEach(function (s, ix) { if (tieneTilde(s)) tildadas.push(ix); });
         var ult = w[w.length - 1], pen = w[w.length - 2];
+        /* RAE (Libro de estilo, «Acentuación»): las agudas se tildan si acaban en vocal o en -n / -s PRECEDIDAS DE VOCAL; las llanas, si
+           acaban en consonante distinta de -n o -s, en consonante precedida de otra consonante (bíceps, récords, wéstern) o en -y.
+           Por eso una -n o -s tras consonante cuenta como consonante «a secas». */
+        var antesVocal = !!pen && VOCALES.indexOf(pen) >= 0;
         var terminacion = VOCALES.indexOf(ult) >= 0 ? 'vocal'
-            : ult === 'n' ? 'n'
-            : (ult === 's' && pen && VOCALES.indexOf(pen) >= 0) ? 's'
+            : (ult === 'n' && antesVocal) ? 'n'
+            : (ult === 's' && antesVocal) ? 's'
             : 'otra';
-        var normal = (terminacion !== 'otra');   // vocal, n o s
+        var normal = (terminacion !== 'otra');   // vocal, n o s (tras vocal)
+        var nsTrasConsonante = (ult === 'n' || ult === 's') && !!pen && !antesVocal;
+        var fin = terminacion === 'vocal' ? 'vocal' : (nsTrasConsonante ? pen + ult : ult);
 
         var tonica, posDesdeFinal, nombre;
         var n = silabas.length;
@@ -247,7 +253,9 @@
             tildeEn: tildadas.length ? tildadas[0] : -1,
             variasTildes: tildadas.length > 1,
             terminacion: terminacion,
-            normal: normal
+            normal: normal,
+            nsTrasConsonante: nsTrasConsonante,
+            fin: fin                       // lo que se dice que termina la palabra: «vocal», «r», «ds»…
         };
     }
 
@@ -268,11 +276,15 @@
         for (var i = 0; i < a.tildeEn; i++) idx += a.silabas[i].length;
         var m = t.search(/[áéíóú]/);
         var letra = t[m], pos = idx + m;
-        if (DEBILES_TILDE.indexOf(letra) >= 0) {
-            var ant = w[pos - 1], ant2 = w[pos - 2], sig = w[pos + 1];
-            if ((ant && FUERTES.indexOf(ant) >= 0) || (ant === 'h' && ant2 && FUERTES.indexOf(ant2) >= 0) || (sig && FUERTES.indexOf(sig) >= 0)) return '';
-        }
+        if (DEBILES_TILDE.indexOf(letra) >= 0 && vecinaAbierta(w, pos)) return '';
         return 'tilde no justificada (' + a.clase + ', termina en ' + a.terminacion + ')';
+    }
+
+    /* ¿la vocal de la posición pos tiene al lado una vocal abierta (a, e, o), con una hache en medio o sin ella? (maíz, baúl, búho) */
+    function vecinaAbierta(w, pos) {
+        var ant = w[pos - 1], ant2 = w[pos - 2], sig = w[pos + 1], sig2 = w[pos + 2];
+        return (ant && FUERTES.indexOf(ant) >= 0) || (ant === 'h' && ant2 && FUERTES.indexOf(ant2) >= 0) ||
+               (sig && FUERTES.indexOf(sig) >= 0) || (sig === 'h' && sig2 && FUERTES.indexOf(sig2) >= 0);
     }
 
     function esHiatoAcentual(a) {
@@ -285,19 +297,67 @@
         var idx = 0;
         for (var i = 0; i < a.tildeEn; i++) idx += a.silabas[i].length;
         var pos = idx + m;
-        var ant = w[pos - 1], ant2 = w[pos - 2], sig = w[pos + 1];
-        if ((ant && FUERTES.indexOf(ant) >= 0) || (ant === 'h' && ant2 && FUERTES.indexOf(ant2) >= 0) || (sig && FUERTES.indexOf(sig) >= 0)) {
+        if (vecinaAbierta(w, pos)) {
             return true;
         }
         return false;
     }
 
+    /* Formas con DOS grafías válidas según la RAE (Libro de estilo, «Acentuación», variantes): video/vídeo, fútbol/futbol, chófer/chofer,
+       período/periodo, cardíaco/cardiaco… Se escribe cada base sin tilde y con tilde; vale cualquiera, con plural -s / -es. */
+    var VARIANTES = [
+        ['video', 'vídeo'], ['futbol', 'fútbol'], ['chofer', 'chófer'], ['icono', 'ícono'], ['periodo', 'período'],
+        ['olimpiada', 'olimpíada'], ['cardiaco', 'cardíaco'], ['maniaco', 'maníaco'], ['amoniaco', 'amoníaco'], ['zodiaco', 'zodíaco'],
+        ['policiaco', 'policíaco'], ['austriaco', 'austríaco'], ['elegiaco', 'elegíaco'], ['paradisiaco', 'paradisíaco'],
+        ['demoniaco', 'demoníaco'], ['afrodisiaco', 'afrodisíaco'], ['hipocondriaco', 'hipocondríaco'], ['triada', 'tríada'],
+        ['alveolo', 'alvéolo'], ['bronquiolo', 'bronquíolo'], ['rubeola', 'rubéola']
+    ];
+    /* devuelve las OTRAS grafías válidas de la palabra (vacío si solo hay una) */
+    function variantes(palabra) {
+        var w = String(palabra).normalize('NFC').toLowerCase(), r = [];
+        VARIANTES.forEach(function (par) {
+            ['', 's', 'es'].forEach(function (suf) {
+                if (w === par[0] + suf) r.push(par[1] + suf);
+                else if (w === par[1] + suf) r.push(par[0] + suf);
+            });
+        });
+        return r;
+    }
+    /* respuesta equivalente de otra grafía: índice de la sílaba de a que contiene su tilde, o 'no' si esa grafía no lleva tilde */
+    function respuestaDeVariante(a, v) {
+        var m = v.search(/[áéíóú]/);
+        if (m < 0) return 'no';
+        var acc = 0;
+        for (var i = 0; i < a.silabas.length; i++) { acc += a.silabas[i].length; if (m < acc) return i; }
+        return 'no';
+    }
+
+    var DIACRITICAS = { 'dé': 'de', 'él': 'el', 'más': 'mas', 'mí': 'mi', 'sé': 'se', 'sí': 'si', 'té': 'te', 'tú': 'tu', 'tés': 'tes' };
+    var LETRAS_VOZ = { b: 'be', c: 'ce', d: 'de', f: 'efe', g: 'ge', h: 'hache', j: 'jota', k: 'ka', l: 'ele', m: 'eme', n: 'ene', 'ñ': 'eñe', p: 'pe', q: 'cu', r: 'erre', s: 'ese', t: 'te', v: 'uve', w: 'uve doble', x: 'equis', y: 'i griega', z: 'zeta' };
+
+    /* Explica por qué una palabra lleva tilde o no, con las reglas del Libro de estilo de la RAE («Acentuación»):
+       · agudas: tilde si acaban en vocal o en -n / -s precedidas de vocal
+       · llanas: tilde si acaban en consonante distinta de -n o -s, en consonante precedida de otra consonante, o en -y
+       · esdrújulas y sobresdrújulas: siempre
+       · vocal cerrada (i, u) tónica junto a una abierta (a, e, o): siempre (maíz, baúl, búho), sea cual sea la terminación
+       · monosílabas: no se tildan, salvo la tilde diacrítica (té, él, más…) */
     function explicarTilde(a) {
+        var otras = variantes(a.palabra);
+        if (otras.length) {
+            var formas = [a.palabra, otras[0]];
+            var conT = formas.filter(function (f) { return /[áéíóú]/.test(f); })[0], sinT = formas.filter(function (f) { return !/[áéíóú]/.test(f); })[0];
+            return {
+                regla: 'Dos grafías válidas',
+                detalle: 'la RAE admite las dos formas: «' + conT + '» (con tilde) y «' + sinT + '» (sin tilde)',
+                voz: 'Esta palabra se puede escribir de dos maneras, y las dos son correctas: con tilde, ' + conT + ', y sin tilde, ' + sinT + '.',
+                tipo: 'variante'
+            };
+        }
         if (esHiatoAcentual(a)) {
             return {
-                regla: 'Hiato acentual',
-                detalle: 'lleva tilde para deshacer el diptongo (hiato con vocal débil tónica)',
-                voz: 'Lleva tilde para deshacer el diptongo. Es un hiato con vocal débil tónica.',
+                regla: 'Hiato con vocal cerrada tónica',
+                detalle: 'la vocal cerrada (i, u) es tónica y va junto a una abierta (a, e, o): siempre lleva tilde',
+                voz: 'Tiene una vocal cerrada tónica junto a una vocal abierta. Esa sílaba siempre lleva tilde, sea cual sea la terminación de la palabra.',
                 tipo: 'hiato'
             };
         }
@@ -310,51 +370,75 @@
             };
         }
         if (a.clase === 'monosilaba') {
+            if (a.tilde) {
+                var par = DIACRITICAS[a.palabra];
+                return {
+                    regla: 'Tilde diacrítica',
+                    detalle: par ? 'tilde diacrítica: distingue «' + a.palabra + '» de «' + par + '»' : 'tilde diacrítica (interrogativos y exclamativos)',
+                    voz: par ? 'Es una monosílaba con tilde diacrítica: la tilde la distingue de ' + par + '.' : 'Es una monosílaba con tilde diacrítica, la de los interrogativos y exclamativos.',
+                    tipo: 'monosilaba'
+                };
+            }
+            var junta = /[aeiou][aeiou]/.test(quitarTildes(a.palabra));
             return {
                 regla: 'Monosílaba',
-                detalle: a.tilde ? 'monosílaba con tilde diacrítica' : 'las palabras monosílabas no llevan tilde',
-                voz: a.tilde ? 'Es monosílaba con tilde diacrítica.' : 'Las palabras monosílabas no llevan tilde.',
+                detalle: 'las palabras de una sola sílaba no llevan tilde' + (junta ? ' (aunque se pronuncie en dos golpes de voz, se escribe como un diptongo)' : ''),
+                voz: 'Las palabras monosílabas no llevan tilde.' + (junta ? ' Aunque se pronuncie en dos golpes de voz, se escribe como una sola sílaba.' : ''),
                 tipo: 'monosilaba'
             };
         }
         var ult = a.palabra[a.palabra.length - 1];
-        var termDesc = a.terminacion === 'vocal' ? 'vocal' : ('«' + a.terminacion + '»');
         var termVoz = a.terminacion === 'vocal' ? 'vocal' : (a.terminacion === 'n' ? 'ene' : 'ese');
-        var letrasVoz = { b: 'be', c: 'ce', d: 'de', f: 'efe', g: 'ge', h: 'hache', j: 'jota', k: 'ka', l: 'ele', m: 'eme', n: 'ene', 'ñ': 'eñe', p: 'pe', q: 'cu', r: 'erre', s: 'ese', t: 'te', v: 'uve', w: 'uve doble', x: 'equis', y: 'i griega', z: 'zeta' };
-        var nombreUlt = letrasVoz[ult] || ult;
+        var nombreUlt = LETRAS_VOZ[ult] || ult;
+        var tras = a.terminacion === 'vocal' ? 'vocal' : '«' + ult + '» detrás de vocal';
+        if (a.nsTrasConsonante && (a.clase === 'aguda' || a.clase === 'llana')) {
+            var par2 = '«' + a.fin + '»', letra = ult === 'n' ? 'ene' : 'ese', guion = '-' + ult;
+            if (a.clase === 'llana') {
+                return {
+                    regla: 'Llana terminada en consonante doble',
+                    detalle: 'llana terminada en ' + par2 + ' (' + guion + ' tras otra consonante): lleva tilde',
+                    voz: 'Es llana y termina en ' + letra + ' detrás de otra consonante. Las llanas que acaban en consonante precedida de otra consonante llevan tilde.',
+                    tipo: 'llana_ns_consonante'
+                };
+            }
+            return {
+                regla: 'Aguda terminada en consonante doble',
+                detalle: 'aguda terminada en ' + par2 + ' (' + guion + ' tras otra consonante): no lleva tilde',
+                voz: 'Es aguda y termina en ' + letra + ' detrás de otra consonante. Las agudas solo llevan tilde si acaban en vocal, o en ene o ese detrás de vocal.',
+                tipo: 'aguda_ns_consonante'
+            };
+        }
         if (a.clase === 'aguda') {
             if (a.tilde) {
                 return {
                     regla: 'Aguda con tilde',
-                    detalle: 'aguda terminada en ' + termDesc,
-                    voz: 'Es aguda y termina en ' + termVoz + ', por lo que sí lleva tilde.',
+                    detalle: 'aguda terminada en ' + tras,
+                    voz: 'Es aguda y termina en ' + (a.terminacion === 'vocal' ? 'vocal' : termVoz + ' detrás de vocal') + ', por lo que sí lleva tilde.',
                     tipo: 'aguda_si'
                 };
-            } else {
-                return {
-                    regla: 'Aguda sin tilde',
-                    detalle: 'aguda terminada en «' + ult + '» (consonante distinta de «n» o «s»)',
-                    voz: 'Es aguda y termina en ' + nombreUlt + ', por lo que no lleva tilde.',
-                    tipo: 'aguda_no'
-                };
             }
+            return {
+                regla: 'Aguda sin tilde',
+                detalle: ult === 'y' ? 'aguda terminada en «y» (cuenta como consonante)' : 'aguda terminada en «' + ult + '» (consonante distinta de «n» o «s»)',
+                voz: 'Es aguda y termina en ' + nombreUlt + ', que es consonante, por lo que no lleva tilde.',
+                tipo: 'aguda_no'
+            };
         }
         if (a.clase === 'llana') {
             if (a.tilde) {
                 return {
                     regla: 'Llana con tilde',
-                    detalle: 'llana terminada en «' + ult + '» (consonante distinta de «n» o «s»)',
-                    voz: 'Es llana y termina en ' + nombreUlt + ', no en vocal, ene o ese, por lo que sí lleva tilde.',
+                    detalle: ult === 'y' ? 'llana terminada en «y» (cuenta como consonante)' : 'llana terminada en «' + ult + '» (consonante distinta de «n» o «s»)',
+                    voz: 'Es llana y termina en ' + nombreUlt + (ult === 'y' ? ', que cuenta como consonante' : ', que es consonante distinta de ene o ese') + ', por lo que sí lleva tilde.',
                     tipo: 'llana_si'
                 };
-            } else {
-                return {
-                    regla: 'Llana sin tilde',
-                    detalle: 'llana terminada en ' + termDesc,
-                    voz: 'Es llana y termina en ' + termVoz + ', por lo que no lleva tilde.',
-                    tipo: 'llana_no'
-                };
             }
+            return {
+                regla: 'Llana sin tilde',
+                detalle: 'llana terminada en ' + tras,
+                voz: 'Es llana y termina en ' + (a.terminacion === 'vocal' ? 'vocal' : termVoz + ' detrás de vocal') + ', por lo que no lleva tilde.',
+                tipo: 'llana_no'
+            };
         }
         return {
             regla: 'Regla general',
@@ -369,6 +453,8 @@
         revisarTilde: revisarTilde,
         esHiatoAcentual: esHiatoAcentual,
         explicarTilde: explicarTilde,
+        variantes: variantes,
+        respuestaDeVariante: respuestaDeVariante,
         quitarTildes: quitarTildes,
         tieneTilde: tieneTilde,
         excepciones: EXCEPCIONES
