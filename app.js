@@ -429,13 +429,44 @@ const app = {
             this.pintarTiempo();
             this.$('hud-time').classList.remove('danger');
         }
-        this.$('answer-note').innerHTML = '';
-        this.pintarPregunta();
+        if (s.actividad === 'combinada' && this.$('question-area').firstElementChild && this.$('question-area').animate) {
+            // «Todo junto»: lo que sale se desvanece y lo que entra aparece rápido; las fichas de la palabra se deslizan a su sitio nuevo
+            this.pintarConTransicion(q, !!prev && prev.A === q.A);
+        } else {
+            this.$('answer-note').innerHTML = '';
+            this.pintarPregunta();
+        }
         if (nueva) {
             if (VozUI.palabras()) Voz.decir(q.A.palabra, vozPalabra(q.A));              // pronuncia la palabra nueva
             s.proxima = this.elegirPalabra(s.actividad);               // y deja lista la siguiente (se sintetiza mientras se juega)
             if (VozUI.palabras()) Voz.precargar(s.proxima.palabra, vozPalabra(s.proxima));
         }
+    },
+
+    /* Cambio de fase en «Todo junto» (sílabas ➜ tónica ➜ clase ➜ tilde ➜ palabra nueva), en menos de medio segundo:
+       1) lo que desaparece se desvanece (0,11 s); las fichas de las sílabas de la MISMA palabra se quedan donde están
+       2) se pinta la fase nueva; lo que entra aparece con un fundido (0,18 s)
+       3) las fichas (y sus guiones) no saltan a su nueva posición: se deslizan desde la antigua con aceleración y frenada (0,24 s) */
+    async pintarConTransicion(q, misma) {
+        const s = this.state, area = this.$('question-area'), texto = this.$('question-text'), nota = this.$('answer-note');
+        const fichas = () => [...area.querySelectorAll('.sil-fila > *')];
+        const antes = misma ? fichas().map(e => { const r = e.getBoundingClientRect(); return { x: r.left, y: r.top }; }) : [];
+        const conFichas = e => misma && e.querySelector && e.querySelector('.sil-chip');
+        const salen = [...area.children].filter(e => !conFichas(e)).concat([texto, nota]);
+        const anims = salen.map(e => e.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 110, easing: 'ease-in', fill: 'forwards' }));
+        await Promise.all(anims.map(a => a.finished.catch(() => {})));
+        anims.forEach(a => a.cancel());
+        if (!s.isPlaying || s.q !== q) return;          // mientras tanto terminó la partida o ya hay otra pregunta
+        nota.innerHTML = '';
+        this.pintarPregunta();
+        const nuevas = fichas();
+        if (misma && antes.length === nuevas.length) {
+            nuevas.forEach((e, i) => {
+                const r = e.getBoundingClientRect(), dx = antes[i].x - r.left, dy = antes[i].y - r.top;
+                if (Math.abs(dx) + Math.abs(dy) > 1) e.animate([{ transform: 'translate(' + dx + 'px,' + dy + 'px)' }, { transform: 'none' }], { duration: 240, easing: 'cubic-bezier(0.45, 0, 0.2, 1)' });
+            });
+        }
+        [...area.children].filter(e => !conFichas(e)).concat([texto]).forEach(e => e.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 180, easing: 'ease-out' }));
     },
 
     pintarPregunta() {
