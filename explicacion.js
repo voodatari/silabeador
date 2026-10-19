@@ -71,10 +71,12 @@ window.Explicacion = (function () {
             'Por eso es <b class="ex-bien">' + NOMBRE[A.clase] + '</b>.';
     }
 
-    function pasosClase(A) {
+    /* «hecho»: pasos que el jugador ya ha resuelto bien antes en «Todo junto»; no se vuelven a explicar */
+    function pasosClase(A, hecho) {
+        hecho = hecho || [];
         return '<ol class="ex-pasos">' +
-            '<li>Divide la palabra en <b>sílabas</b> (golpes de voz): ' + fichas(A, false) + '</li>' +
-            '<li>Busca la <b>sílaba tónica</b>, la que suena más fuerte. La tónica es ' + sil(A.silabas[A.tonica]) + '.<div class="ex-truco">' + TRUCO + '</div></li>' +
+            (hecho.indexOf('silabas') >= 0 ? '' : '<li>Divide la palabra en <b>sílabas</b> (golpes de voz): ' + fichas(A, false) + '</li>') +
+            (hecho.indexOf('tonica') >= 0 ? '' : '<li>Busca la <b>sílaba tónica</b>, la que suena más fuerte. La tónica es ' + sil(A.silabas[A.tonica]) + '.<div class="ex-truco">' + TRUCO + '</div></li>') +
             '<li>Cuenta desde el <b>final</b> hasta la tónica:' + posiciones(A) +
                 '<div class="ex-conclusion">Antepenúltima ➜ esdrújula · Penúltima ➜ llana · Última ➜ aguda<br>' +
                 'Es <b class="ex-bien">' + NOMBRE[A.clase] + '</b>.</div></li>' +
@@ -88,12 +90,13 @@ window.Explicacion = (function () {
             'La sílaba tónica es ' + sil(A.silabas[A.tonica]) + '. ' + reglaTonica(A);
     }
 
-    function pasosTonica(A) {
+    function pasosTonica(A, hecho) {
+        var todoJunto = (hecho || []).length > 0;      // «Todo junto»: solo la tónica, sin decir la clase
         return '<ol class="ex-pasos">' +
             '<li>Di la palabra en voz alta, alargando cada sílaba. ' + TRUCO + '</li>' +
             '<li>¿Lleva tilde? ' + (A.tilde ? reglaTonica(A) : 'No. La tónica es la sílaba que suena más fuerte: ' + sil(A.silabas[A.tonica]) + '.') + '</li>' +
             '<li>Así queda, con la tónica marcada:' + posiciones(A) +
-                '<div class="ex-conclusion">Es <b class="ex-bien">' + NOMBRE[A.clase] + '</b> (la tónica es la ' + ORDINAL[A.pos] + ').</div></li>' +
+                (todoJunto ? '' : '<div class="ex-conclusion">Es <b class="ex-bien">' + NOMBRE[A.clase] + '</b> (la tónica es la ' + ORDINAL[A.pos] + ').</div>') + '</li>' +
             '</ol>';
     }
 
@@ -114,11 +117,11 @@ window.Explicacion = (function () {
             'Motivo: ' + exp.detalle + '.';
     }
 
-    function pasosTilde(A) {
-        var exp = Silabeo.explicarTilde(A);
+    function pasosTilde(A, hecho) {
+        var exp = Silabeo.explicarTilde(A), antes = (hecho || []).length > 0;      // «Todo junto»: sílabas, tónica y clase ya hechas
         return '<ol class="ex-pasos">' +
-            '<li>Divide en <b>sílabas</b> y busca la <b>tónica</b>: ' + fichas(A, true) + ' (la tónica es ' + sil(A.silabas[A.tonica]) + ', la ' + ORDINAL[A.pos] + ').</li>' +
-            '<li>Clasifícala según su posición: es <b>' + NOMBRE[A.clase] + '</b> y termina en <b>' + A.fin + '</b>.</li>' +
+            (antes ? '' : '<li>Divide en <b>sílabas</b> y busca la <b>tónica</b>: ' + fichas(A, true) + ' (la tónica es ' + sil(A.silabas[A.tonica]) + ', la ' + ORDINAL[A.pos] + ').</li>' +
+            '<li>Clasifícala según su posición: es <b>' + NOMBRE[A.clase] + '</b> y termina en <b>' + A.fin + '</b>.</li>') +
             '<li>Aplica la <b>regla de acentuación</b>:' +
                 '<div class="ex-conclusion">' + exp.detalle.charAt(0).toUpperCase() + exp.detalle.slice(1) + '.<br>' +
                 (A.tilde
@@ -290,18 +293,18 @@ window.Explicacion = (function () {
             enunciado = 'Clasifica ' + b(A.palabra) + ' según su sílaba tónica';
             mal = NOMBRE[d.elegida]; bien = NOMBRE[A.clase];
             porQue = '<p>' + porQueClase(A, d.elegida) + '</p>';
-            como = pasosClase(A);
+            como = pasosClase(A, d.hecho);
         } else if (d.tipo === 'tonica') {
             enunciado = '¿Cuál es la sílaba tónica de ' + b(A.palabra) + '?';
             mal = A.silabas[d.elegida]; bien = A.silabas[A.tonica];
             porQue = '<p>' + porQueTonica(A, d.elegida) + '</p>';
-            como = pasosTonica(A);
+            como = pasosTonica(A, d.hecho);
         } else if (d.tipo === 'tilde') {
             enunciado = '¿Debe llevar tilde la palabra ' + b(Silabeo.quitarTildes(A.palabra)) + '?';
             mal = d.elegida === 'no' ? 'No lleva tilde' : 'Tilde en «' + Silabeo.quitarTildes(A.silabas[d.elegida] || '') + '»';
             bien = A.tilde ? 'Tilde en «' + A.silabas[A.tildeEn] + '» (' + A.palabra + ')' : 'No lleva tilde (' + A.palabra + ')';
             porQue = '<p>' + porQueTilde(A, d.elegida) + '</p>';
-            como = pasosTilde(A);
+            como = pasosTilde(A, d.hecho);
         } else {
             enunciado = 'Divide ' + b(A.palabra) + ' en sílabas (golpes de voz)';
             mal = partirPor(A.palabra, d.elegida).join('-'); bien = A.silabas.join('-');
