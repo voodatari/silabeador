@@ -4,6 +4,10 @@ Historial completo desde que empezó el proyecto (8 de octubre de 2026), no solo
 
 Formato de versión: `AAAA.MM.DD-letra`, igual que el número que llevan los archivos en `index.html`; desde la 2.0, número de versión (2.0, 2.0.1, 2.1…). Las fechas son las reales: algunas versiones de la primera tarde llevan «2026.10.09» en el nombre pero se hicieron el 8.
 
+## [2.3.4] - 2026-10-19
+- Los destellos de color de acierto y fallo de los bordes entran y salen con un fundido muy rápido (entrada 0,1 s, salida 0,35 s) en vez de aparecer y desaparecer de golpe.
+- Arreglada la **sacudida lateral de «fallo» al empezar una partida nueva** (al «Jugar otra vez» o desde el menú) cuando la anterior había acabado en error: la clase de la sacudida se quedaba puesta en el tablero y se repetía al volver a mostrarse. Ahora se quita sola al acabar la animación (y al empezar cada partida). Lo mismo para las animaciones de la racha y de la cuenta atrás.
+
 ## [2.3.2] - 2026-10-19
 - La ventana de «la respuesta correcta» oscurece mucho menos el fondo: se sigue viendo el juego detrás.
 - Al empezar una partida, la primera palabra ya no «se agita» como si fuera un fallo: la palabra solo aparece (antes crecía y giraba un poco al entrar) y el tablero solo aparece (antes entraba encogiéndose del 95 % al 100 %, y a la vez la palabra se movía). Si en el móvil sigue notándose una sacudida, avisadme con la actividad y el modo.

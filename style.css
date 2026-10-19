@@ -312,9 +312,13 @@ button.sil-chip:hover { border-color: var(--secondary); background: rgba(110, 23
 .float-bad { color: var(--danger); }
 @keyframes float-up { 0% { opacity: 0; transform: translate(-50%, -30%) scale(0.6); } 20% { opacity: 1; transform: translate(-50%, -80%) scale(1.15); } 100% { opacity: 0; transform: translate(-50%, -220%) scale(1); } }
 
-.feedback-fx { position: fixed; inset: 0; pointer-events: none; z-index: 100; opacity: 0; transition: opacity 0.2s; }
-.feedback-fx.correct { background: radial-gradient(circle, transparent 40%, rgba(91, 227, 161, 0.22) 100%); opacity: 1; }
-.feedback-fx.wrong { background: radial-gradient(circle, transparent 40%, rgba(255, 93, 143, 0.3) 100%); opacity: 1; }
+.feedback-fx { position: fixed; inset: 0; pointer-events: none; z-index: 100; opacity: 0; transition: opacity 0.35s ease-out; }
+.feedback-fx.on { opacity: 1; transition: opacity 0.1s ease-out; }
+/* con id: si no, «.screen.active > *» (que pone opacidad 1 a todo hijo directo de la pantalla) gana y el destello no se apaga nunca */
+#feedback-overlay.feedback-fx { opacity: 0; transform: none; transition: opacity 0.35s ease-out; }
+#feedback-overlay.feedback-fx.on { opacity: 1; transition: opacity 0.1s ease-out; }
+.feedback-fx.correct { background: radial-gradient(circle, transparent 40%, rgba(91, 227, 161, 0.22) 100%); }
+.feedback-fx.wrong { background: radial-gradient(circle, transparent 40%, rgba(255, 93, 143, 0.3) 100%); }
 
 /* ---------- Resultados ---------- */
 .stats-display { display: flex; justify-content: center; gap: 1.4rem; margin: 1.4rem 0; flex-wrap: wrap; }

@@ -6,11 +6,21 @@ function esc(value) {
     });
 }
 
+/* Reinicia una animación de CSS. La clase se quita sola al acabar: si se quedara puesta, la animación volvería a ejecutarse cada vez que
+   el elemento reaparece (p. ej. la sacudida de «fallo» del tablero al empezar una partida nueva tras acabar la anterior en error). */
 function restartAnimation(el, className) {
     if (!el) return;
     el.classList.remove(className);
     void el.offsetWidth;   // fuerza reflow para reiniciar la animación
     el.classList.add(className);
+    if (el._finAnim) el.removeEventListener('animationend', el._finAnim);
+    el._finAnim = function (e) {
+        if (e.target !== el) return;
+        el.classList.remove(className);
+        el.removeEventListener('animationend', el._finAnim);
+        el._finAnim = null;
+    };
+    el.addEventListener('animationend', el._finAnim);
 }
 
 // --- Avisos flotantes ---

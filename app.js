@@ -318,6 +318,8 @@ const app = {
         this.$('question-text').innerHTML = '';
         this.$('step-indicator').innerHTML = '';
         this.$('answer-note').innerHTML = '';
+        document.querySelector('.game-board').classList.remove('shake');      // nada de la partida anterior (sacudida de fallo) se arrastra a la nueva
+        this.$('feedback-overlay').className = 'feedback-fx';
 
         const hudTimer = this.$('hud-time-container'), hudLives = this.$('hud-lives-container'), hudScore = this.$('hud-score-container');
         this.$('hud-time').classList.remove('danger');
@@ -825,12 +827,16 @@ const app = {
     feedback(ok) {
         Sonido.efecto(ok ? 'acierto' : 'error');
         const overlay = this.$('feedback-overlay');
+        // el color no se quita al acabar (si no, desaparecía de golpe): solo se sube y se baja la opacidad, con un fundido rápido
+        clearTimeout(this._tFeedback);
         overlay.className = 'feedback-fx ' + (ok ? 'correct' : 'wrong');
+        void overlay.offsetWidth;
+        overlay.classList.add('on');
         if (!ok) {
             const board = document.querySelector('.game-board');
             restartAnimation(board, 'shake');
         }
-        setTimeout(() => { overlay.className = 'feedback-fx'; }, 300);
+        this._tFeedback = setTimeout(() => { overlay.classList.remove('on'); }, 220);
     },
 
     popup(texto, clase) {
