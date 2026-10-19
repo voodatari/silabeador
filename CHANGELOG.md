@@ -4,6 +4,10 @@ Historial completo desde que empezó el proyecto (8 de octubre de 2026), no solo
 
 Formato de versión: `AAAA.MM.DD-letra`, igual que el número que llevan los archivos en `index.html`; desde la 2.0, número de versión (2.0, 2.0.1, 2.1…). Las fechas son las reales: algunas versiones de la primera tarde llevan «2026.10.09» en el nombre pero se hicieron el 8.
 
+## [2.3.0] - 2026-10-19
+- **Ventana con la respuesta correcta al fallar** cuando «Explicar los fallos» está en «No» (o en «En práctica» y se juega en otro modo): en práctica sale siempre; en los demás modos hay un interruptor nuevo en las opciones, **«Ver la respuesta al fallar»** (desactivado por defecto). Mientras la ventana está abierta el juego y el reloj están parados (también el de cada pregunta en supervivencia). Se cierra con el botón, Intro, espacio o Escape; en muerte súbita y al perder la última vida en supervivencia, la partida termina al cerrarla. También sale cuando se agota el tiempo de una pregunta en supervivencia.
+- **La cinta del menú muestra la versión exacta** (v2.3.0), para saber qué versión se está usando. Se actualiza en cada publicación.
+
 ## [2.2.4] - 2026-10-19
 - «Todo junto»: tras explicar el paso fallado, el juego **sigue con esa misma palabra** (los pasos que quedan: si fallas la tónica, después te pregunta la clase y la tilde de esa palabra). Antes saltaba a una palabra nueva. Solo cambia de palabra cuando se acaban los pasos.
 

@@ -782,3 +782,9 @@ html.movil .answer-note.nota-tonica, html.movil .answer-note.nota-clasificar { -
     .answer-note.nota-tilde { --lineas: 3; }
     .answer-note.nota-tonica, .answer-note.nota-clasificar { --lineas: 2; }
 }
+
+
+/* Ventana con la respuesta correcta tras un fallo (sin explicación) */
+.resp-palabra { font-family: var(--font-word); font-weight: 700; font-size: 2.2rem; color: #f3f6ee; margin: 0.2rem 0 0.4rem; }
+.resp-overlay .dialog-message { font-size: 1.05rem; line-height: 1.4; }
+.resp-overlay .dialog-message b { color: var(--good); }

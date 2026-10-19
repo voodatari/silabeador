@@ -7,7 +7,7 @@
    ========================================================= */
 window.VozUI = (function () {
 
-    var K_PAL = 'silabeador.vozPalabras', K_EXP = 'silabeador.explicaAnimada', K_CUANDO = 'silabeador.explicarFallos';
+    var K_PAL = 'silabeador.vozPalabras', K_EXP = 'silabeador.explicaAnimada', K_CUANDO = 'silabeador.explicarFallos', K_RESP = 'silabeador.verRespuesta';
     function leer(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
     function escribir(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
     function $(id) { return document.getElementById(id); }
@@ -15,14 +15,16 @@ window.VozUI = (function () {
     var palabras = leer(K_PAL) !== '0';
     var explica = leer(K_EXP) !== '0';        // activada por defecto
     var cuando = leer(K_CUANDO); if (['no', 'practica', 'siempre'].indexOf(cuando) < 0) cuando = 'siempre';     // por defecto: en todos los modos
+    var verRespuesta = leer(K_RESP) === '1';     // ventana con la respuesta correcta al fallar, también en los demás modos (en práctica siempre, si no se explica)
     var alCambiar = null;
     var chip = $('voz-carga'), texto = $('voz-carga-texto'), barra = $('voz-carga-barra');
-    var botonPal = $('voz-palabras-button'), botonExp = $('voz-explica-button'), segCuando = $('explicar-seg');
+    var botonPal = $('voz-palabras-button'), botonExp = $('voz-explica-button'), botonResp = $('resp-toggle-button'), segCuando = $('explicar-seg');
     var ocultar = null;
 
     function pintar() {
         botonPal.setAttribute('aria-pressed', String(palabras));
         botonExp.setAttribute('aria-pressed', String(explica));
+        botonResp.setAttribute('aria-pressed', String(verRespuesta));
         segCuando.querySelectorAll('button').forEach(function (b) { b.classList.toggle('selected', b.dataset.explicar === cuando); });
         if (alCambiar) alCambiar();
     }
@@ -67,6 +69,10 @@ window.VozUI = (function () {
         sonar(); explica = !explica; escribir(K_EXP, explica ? '1' : '0'); if (explica) cargar(); pintar();
     });
 
+    botonResp.addEventListener('click', function () {
+        sonar(); verRespuesta = !verRespuesta; escribir(K_RESP, verRespuesta ? '1' : '0'); pintar();
+    });
+
     segCuando.addEventListener('click', function (e) {
         var b = e.target.closest('button'); if (!b) return;
         sonar(); cuando = b.dataset.explicar; escribir(K_CUANDO, cuando); pintar();
@@ -81,6 +87,8 @@ window.VozUI = (function () {
         explicacion: function () { return explica; },
         /* ¿se explica un fallo en este modo de juego? */
         explicarEn: function (modo) { return cuando === 'siempre' || (cuando === 'practica' && modo === 'practice'); },
+        /* ¿se muestra la ventana con la respuesta correcta? Solo si no se explica: en práctica siempre; en los demás modos si el jugador lo activa */
+        respuestaEn: function (modo) { return !(cuando === 'siempre' || (cuando === 'practica' && modo === 'practice')) && (modo === 'practice' || verRespuesta); },
         alCambiar: function (fn) { alCambiar = fn; }
     };
 

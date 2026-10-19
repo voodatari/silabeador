@@ -741,6 +741,13 @@ const app = {
             // en «Todo junto» la explicación cuenta solo el paso fallado, así que se sigue con el paso siguiente de la MISMA palabra
             // (si era el último, siguientePregunta pasa a una palabra nueva)
             this.siguientePregunta();
+        } else if (VozUI.respuestaEn(s.mode)) {      // sin explicación: ventana con la respuesta correcta (el juego y el reloj se paran)
+            const terminada = s.mode === 'sudden_death' || (s.mode === 'survival' && s.lives <= 0);
+            if (terminada) Sonido.musica('fin');
+            await this.mostrarRespuesta(q);
+            if (!s.isPlaying) return;
+            if (terminada) { this.endGame(); return; }
+            this.siguientePregunta();
         } else if (s.mode === 'practice') {      // práctica sin explicaciones
             this.later(() => this.siguientePregunta(), 1600);
         } else if (s.mode === 'sudden_death') {
@@ -751,6 +758,42 @@ const app = {
         } else {   // contrarreloj
             this.later(() => this.siguientePregunta(), 1300);
         }
+    },
+
+    /* Ventana con la respuesta correcta tras un fallo (cuando no se explica). El juego y el reloj están parados mientras está abierta;
+       se cierra con el botón, Intro, espacio o Escape. Devuelve una promesa que se cumple al cerrarla. */
+    mostrarRespuesta(q, titulo) {
+        const s = this.state, A = q.A;
+        s.pausado = true;
+        return new Promise(resolve => {
+            const previo = document.activeElement;
+            const velo = document.createElement('div');
+            velo.className = 'dialog-overlay resp-overlay';
+            velo.innerHTML = '<div class="dialog-box" role="dialog" aria-modal="true" aria-labelledby="resp-titulo">' +
+                '<div class="dialog-icon">💡</div>' +
+                '<h3 id="resp-titulo" class="dialog-title">' + (titulo || 'La respuesta correcta') + '</h3>' +
+                '<div class="resp-palabra">' + esc(A.palabra) + '</div>' +
+                '<p class="dialog-message">' + this.notaRespuesta(q, false) + '</p>' +
+                '<div class="dialog-actions"><button type="button" class="btn-primary resp-ok">¡Entendido! Siguiente ➜</button></div>' +
+                '</div>';
+            document.body.appendChild(velo);
+            let cerrado = false;
+            const cerrar = () => {
+                if (cerrado) return;
+                cerrado = true;
+                document.removeEventListener('keydown', onKey, true);
+                Sonido.efecto('click');
+                velo.classList.add('dialog-out');
+                setTimeout(() => velo.remove(), 200);
+                if (previo && typeof previo.focus === 'function') previo.focus();
+                s.pausado = false;
+                resolve();
+            };
+            const onKey = ev => { if (ev.key === 'Escape' || ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); ev.stopPropagation(); cerrar(); } };
+            document.addEventListener('keydown', onKey, true);
+            velo.querySelector('.resp-ok').addEventListener('click', cerrar);
+            setTimeout(() => { const bt = velo.querySelector('.resp-ok'); if (bt && !cerrado) bt.focus({ preventScroll: true }); }, 50);
+        });
     },
 
     tiempoAgotadoPregunta() {      // supervivencia: se acabó el reloj de la pregunta
@@ -766,6 +809,15 @@ const app = {
         this.pintarVidas();
         this.$('answer-note').innerHTML = '⏰ ¡Tiempo! ' + this.notaRespuesta(q, false);
         this.feedback(false);
+        if (VozUI.respuestaEn(s.mode) && !VozUI.explicarEn(s.mode)) {      // ventana con la respuesta (el reloj se para mientras está abierta)
+            (async () => {
+                if (s.lives <= 0) Sonido.musica('fin');
+                await this.mostrarRespuesta(q, '⏰ ¡Se acabó el tiempo!');
+                if (!s.isPlaying) return;
+                if (s.lives <= 0) this.endGame(); else this.siguientePregunta();
+            })();
+            return;
+        }
         if (s.lives <= 0) this.later(() => this.endGame(), 1800);
         else this.later(() => this.siguientePregunta(), 1600);
     },
