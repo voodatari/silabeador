@@ -4,6 +4,9 @@ Historial completo desde que empezó el proyecto (8 de octubre de 2026), no solo
 
 Formato de versión: `AAAA.MM.DD-letra`, igual que el número que llevan los archivos en `index.html`; desde la 2.0, número de versión (2.0, 2.0.1, 2.1…). Las fechas son las reales: algunas versiones de la primera tarde llevan «2026.10.09» en el nombre pero se hicieron el 8.
 
+## [2.3.7] - 2026-10-19
+- Voz de la explicación de la tilde: ya no termina con «Por eso se escribe con tilde: …» ni repite la palabra; acaba en la regla («…por lo que sí lleva tilde»). El texto de la pantalla no cambia.
+
 ## [2.3.6] - 2026-10-19
 - **«Todo junto»: las explicaciones ya no dan pistas de la tilde.** Al explicar un fallo en las sílabas, la tónica o la clase, la palabra y sus sílabas se ven **sin tildes** (en la explicación animada y en la escrita), y se salta la frase «lleva tilde en la …» de la tónica. La voz sigue pronunciando bien la palabra. Con la tilde a la vista solo se explica la fase de la tilde y las actividades sueltas.
 - La voz ya no dice «Vamos a verlo / comprobarlo paso a paso» cuando solo hay un paso que explicar (los fallos de «Todo junto» tras acertar las fases anteriores).

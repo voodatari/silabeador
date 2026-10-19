@@ -245,7 +245,7 @@ window.Infografia = (function () {
         });
         b.push({
             cap: (hecho.length ? '' : '4 · ') + 'Regla: ' + exp.detalle + '<br>➜ <b class="ig-bien">' + A.palabra + '</b>' + (A.tilde ? ' (con tilde)' : ' (sin tilde)'),
-            voz: exp.voz + (A.tilde ? ' Por eso se escribe con tilde: ' + A.palabra + '.' : ' Por eso se escribe sin tilde: ' + A.palabra + '.'),
+            voz: exp.voz,      // termina con la regla; no se repite «por eso se escribe…» ni la palabra
             anim: function (e) { if (A.tilde) e.marcarRegla(); },
             final: true
         });
