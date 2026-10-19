@@ -4,6 +4,9 @@ Historial completo desde que empezó el proyecto (8 de octubre de 2026), no solo
 
 Formato de versión: `AAAA.MM.DD-letra`, igual que el número que llevan los archivos en `index.html`; desde la 2.0, número de versión (2.0, 2.0.1, 2.1…). Las fechas son las reales: algunas versiones de la primera tarde llevan «2026.10.09» en el nombre pero se hicieron el 8.
 
+## [2.2.4] - 2026-10-19
+- «Todo junto»: tras explicar el paso fallado, el juego **sigue con esa misma palabra** (los pasos que quedan: si fallas la tónica, después te pregunta la clase y la tilde de esa palabra). Antes saltaba a una palabra nueva. Solo cambia de palabra cuando se acaban los pasos.
+
 ## [2.2.3] - 2026-10-19
 - **«Todo junto»: se explica solo el paso en el que se ha fallado.** Como se llega a cada paso habiendo acertado los anteriores, ya no se repite lo que el jugador hizo bien: si falla la **tilde**, solo se explica la regla de la tilde (la palabra sale ya dividida, con la tónica y la clase puestas, sin explicarlas); si falla la **clase**, solo se cuenta desde el final hasta la tónica; si falla la **tónica**, solo se busca la tónica; si falla la **división**, la explicación de siempre. Vale para la explicación animada con voz y para la escrita. Las actividades sueltas se explican completas, como antes. En la explicación escrita de la tónica ya no salen las etiquetas «última / penúltima».
 

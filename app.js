@@ -738,8 +738,8 @@ const app = {
             s.pausado = false;
             if (!s.isPlaying) return;
             if (terminada) { this.endGame(); return; }
-            // nunca se vuelve a preguntar algo que la explicación acaba de contar: en «Todo junto» se pasa a la palabra siguiente
-            if (q.pasos && (q.tipo === 'tonica' || q.tipo === 'clasificar' || q.tipo === 'tilde')) q.paso = q.pasos.length - 1;
+            // en «Todo junto» la explicación cuenta solo el paso fallado, así que se sigue con el paso siguiente de la MISMA palabra
+            // (si era el último, siguientePregunta pasa a una palabra nueva)
             this.siguientePregunta();
         } else if (s.mode === 'practice') {      // práctica sin explicaciones
             this.later(() => this.siguientePregunta(), 1600);
