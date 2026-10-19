@@ -95,7 +95,7 @@ window.Explicacion = (function () {
         return '<ol class="ex-pasos">' +
             '<li>Di la palabra en voz alta, alargando cada sílaba. ' + TRUCO + '</li>' +
             '<li>¿Lleva tilde? ' + (A.tilde ? reglaTonica(A) : 'No. La tónica es la sílaba que suena más fuerte: ' + sil(A.silabas[A.tonica]) + '.') + '</li>' +
-            '<li>Así queda, con la tónica marcada:' + posiciones(A) +
+            '<li>Así queda, con la tónica marcada:' + (todoJunto ? '<div class="ex-pos-sola">' + fichas(A, true) + '</div>' : posiciones(A)) +
                 (todoJunto ? '' : '<div class="ex-conclusion">Es <b class="ex-bien">' + NOMBRE[A.clase] + '</b> (la tónica es la ' + ORDINAL[A.pos] + ').</div>') + '</li>' +
             '</ol>';
     }
