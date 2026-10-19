@@ -317,7 +317,10 @@ window.Infografia = (function () {
         var etqs = this.chips().map(function (c) { return c.querySelector('.ig-etq'); }), guardado = null;
         if (this.tipo !== 'silabas') {
             guardado = { pild: this.pildorasEl.innerHTML, etqs: etqs.map(function (e) { return e.innerHTML; }), ins: this.insignia.textContent, insC: this.insignia.className };
-            if (!this.pildorasEl.innerHTML) this.pildorasEl.innerHTML = '<span class="ig-pill mal">✗ Tu respuesta <b>esdrújula</b></span><span class="ig-pill bien">✓ Correcta <b>esdrújula</b></span>';
+            if (!this.pildorasEl.innerHTML) {
+                var largo = this.tipo === 'tilde' ? 'Tilde en «' + this.A.silabas.reduce(function (a, s) { return s.length > a.length ? s : a; }, '') + '»' : 'esdrújula';
+                this.pildorasEl.innerHTML = '<span class="ig-pill mal">✗ Tu respuesta <b>' + largo + '</b></span><span class="ig-pill bien">✓ Correcta <b>' + largo + '</b></span>';
+            }
             etqs.forEach(function (e, k) { var pos = etqs.length - k; e.innerHTML = pos <= 3 ? '<span class="ig-num">' + pos + '</span> ' + I.ORDINAL[pos] : '▲ tónica'; });
             this.insignia.textContent = I.NOMBRE[this.A.clase].toUpperCase(); this.insignia.className = 'ig-insignia ver ' + this.A.clase;
         }

@@ -4,6 +4,10 @@ Historial completo desde que empezó el proyecto (8 de octubre de 2026), no solo
 
 Formato de versión: `AAAA.MM.DD-letra`, igual que el número que llevan los archivos en `index.html`; desde la 2.0, número de versión (2.0, 2.0.1, 2.1…). Las fechas son las reales: algunas versiones de la primera tarde llevan «2026.10.09» en el nombre pero se hicieron el 8.
 
+## [2.2.1] - 2026-10-19
+- Explicación animada en móvil: las dos píldoras («Tu respuesta…» y «Correcta…») van ahora una encima de la otra, así que ya no se cortan por los lados con textos largos como «Tilde en «dián»» (y la escena no se encoge por culpa de ellas). El ajuste de tamaño mide con el texto real de «¿Lleva tilde?».
+- Los bloques de la explicación (píldoras, palabra, sílabas, resultado) se reparten el alto disponible, con más aire entre ellos, en vez de quedar apelotonados.
+
 ## [2.2] - 2026-10-14
 - **Nueva actividad: «¿Lleva tilde?»**. Permite practicar las reglas de acentuación indicando si una palabra debe llevar o no tilde (tocando la sílaba correspondiente o pulsando «No lleva tilde»). Selección equilibrada (50 % palabras con tilde, 50 % sin tilde).
 - **«Todo junto» ampliado a 4 pasos**: División en sílabas ➜ Sílaba tónica ➜ Clasificación (aguda/llana/esdrújula) ➜ Comprobación de tilde.
