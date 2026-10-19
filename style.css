@@ -788,3 +788,26 @@ html.movil .answer-note.nota-tonica, html.movil .answer-note.nota-clasificar { -
 .resp-palabra { font-family: var(--font-word); font-weight: 700; font-size: 2.2rem; color: #f3f6ee; margin: 0.2rem 0 0.4rem; }
 .resp-overlay .dialog-message { font-size: 1.05rem; line-height: 1.4; }
 .resp-overlay .dialog-message b { color: var(--good); }
+
+/* interruptor suelto dentro de «Explicar los fallos» (Ver la respuesta al fallar): una fila, no una tarjeta de la rejilla */
+.aj-interruptor { position: relative; display: flex; align-items: center; gap: 0.7rem; width: 100%; max-width: 30rem; padding: 0.55rem 0.9rem; text-align: left; color: #fff;
+    border-radius: 1rem; background: rgba(0, 0, 0, 0.28); border: 2px solid var(--glass-border); }
+.aj-interruptor .aj-ico { font-size: 1.6rem; line-height: 1; }
+.aj-interruptor .aj-textos { flex: 1 1 auto; display: flex; flex-direction: column; gap: 0.05rem; min-width: 0; }
+.aj-interruptor .aj-sub { font-size: 0.74rem; color: var(--text-muted); font-weight: 400; line-height: 1.25; }
+.aj-interruptor:hover { border-color: var(--primary-glow); }
+.aj-interruptor[aria-pressed="true"] { border-color: var(--secondary); background: rgba(110, 231, 208, 0.1); }
+.aj-interruptor[aria-pressed="true"] .aj-tit { color: var(--secondary); }
+.aj-interruptor[aria-pressed="true"] .perf-switch { background: var(--secondary); }
+.aj-interruptor[aria-pressed="true"] .perf-switch::after { transform: translateX(1.2rem); }
+html.movil .aj-interruptor { padding: 0.45rem 0.6rem; gap: 0.5rem; }
+html.movil .aj-interruptor .aj-tit { font-size: 0.8rem; }
+html.movil .aj-interruptor .aj-sub { font-size: 0.66rem; }
+
+html.movil .aj-fondo .aj-nota { display: none; }      /* en el móvil no cabe sin scroll: lo importante lo dice cada interruptor */
+@media (max-width: 640px) {
+    .aj-fondo .aj-nota { display: none; }
+    .aj-interruptor { padding: 0.45rem 0.6rem; gap: 0.5rem; }
+    .aj-interruptor .aj-tit { font-size: 0.8rem; }
+    .aj-interruptor .aj-sub { font-size: 0.66rem; }
+}
