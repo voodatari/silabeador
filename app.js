@@ -633,8 +633,8 @@ const app = {
         if (q.tipo === 'tilde') {
             const exp = Silabeo.explicarTilde(A);
             if (exp.tipo === 'variante') return (ok ? '¡Bien! ' : 'Era: ') + exp.detalle.charAt(0).toUpperCase() + exp.detalle.slice(1);
-            if (A.tilde) return (ok ? '¡Bien! ' : 'Era: ') + '<b>' + esc(A.palabra) + '</b> sí lleva tilde (' + exp.detalle + ')';
-            return (ok ? '¡Bien! ' : 'Era: ') + '<b>' + esc(A.palabra) + '</b> no lleva tilde (' + exp.detalle + ')';
+            if (A.tilde) return (ok ? '¡Bien! ' : 'Era: ') + '<b>' + esc(A.palabra) + '</b> sí lleva tilde: ' + exp.detalle;
+            return (ok ? '¡Bien! ' : 'Era: ') + '<b>' + esc(A.palabra) + '</b> no lleva tilde: ' + exp.detalle;
         }
     },
 

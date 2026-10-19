@@ -204,7 +204,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
     color: #fff; text-shadow: 0 0 1.4rem rgba(255, 138, 91, 0.55); word-break: keep-all; animation: q-pop 0.35s ease both;
 }
 #palabra-tilde-display { font-size: 2.8rem; margin-bottom: -0.2rem; }
-@keyframes q-pop { 0% { opacity: 0; transform: scale(0.7) rotate(-3deg); } 100% { opacity: 1; transform: none; } }
+@keyframes q-pop { 0% { opacity: 0; } 100% { opacity: 1; } }      /* solo aparece (antes crecía y giraba un poco: parecía una sacudida de fallo) */
 .sil-fila { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 0.5rem; }
 .sil-chip {
     background: rgba(0, 0, 0, 0.35); border: 2px solid var(--glass-border); color: #fff;
@@ -811,3 +811,9 @@ html.movil .aj-fondo .aj-nota { display: none; }      /* en el móvil no cabe si
     .aj-interruptor .aj-tit { font-size: 0.8rem; }
     .aj-interruptor .aj-sub { font-size: 0.66rem; }
 }
+
+/* La ventana de la respuesta correcta deja ver el juego detrás: fondo mucho menos oscuro que el de las explicaciones */
+.resp-overlay { background: rgba(0, 0, 0, 0.32); backdrop-filter: blur(0.12rem); -webkit-backdrop-filter: blur(0.12rem); }
+html.ligero .resp-overlay { background: rgba(6, 16, 22, 0.5); }
+/* al empezar la partida el tablero solo aparece (sin el encogido de 95 % → 100 % de las demás pantallas): nada se mueve ni «se agita» */
+#screen-game > * { transform: none; transition: opacity 0.4s ease; }

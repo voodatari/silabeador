@@ -4,6 +4,10 @@ Historial completo desde que empezó el proyecto (8 de octubre de 2026), no solo
 
 Formato de versión: `AAAA.MM.DD-letra`, igual que el número que llevan los archivos en `index.html`; desde la 2.0, número de versión (2.0, 2.0.1, 2.1…). Las fechas son las reales: algunas versiones de la primera tarde llevan «2026.10.09» en el nombre pero se hicieron el 8.
 
+## [2.3.2] - 2026-10-19
+- La ventana de «la respuesta correcta» oscurece mucho menos el fondo: se sigue viendo el juego detrás.
+- Al empezar una partida, la primera palabra ya no «se agita» como si fuera un fallo: la palabra solo aparece (antes crecía y giraba un poco al entrar) y el tablero solo aparece (antes entraba encogiéndose del 95 % al 100 %, y a la vez la palabra se movía). Si en el móvil sigue notándose una sacudida, avisadme con la actividad y el modo.
+
 ## [2.3.1] - 2026-10-19
 - Opciones: arreglado el diseño tras añadir «Ver la respuesta al fallar». El interruptor ya no es una séptima tarjeta (dejaba «Escala fija» sola y rompía la rejilla de dos columnas ni cabían sus textos): la rejilla vuelve a tener 6 tarjetas y el interruptor está dentro del bloque «Explicar los fallos», que es de lo que trata. Textos más cortos; en móvil el panel sigue cabiendo sin scroll (se oculta la nota explicativa, que ya dicen los propios interruptores).
 
